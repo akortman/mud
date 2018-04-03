@@ -2,7 +2,7 @@
 Music notation-related classes.
 '''
 
-note_names_to_pitch_in_octave = {
+str_to_relative_pitch = {
     'C':   0, 'C#': 1, 'Db':  1, 'D':   2,
     'D#':  3, 'Eb': 3, 'E':   4, 'F':   5,
     'F#':  6, 'Gb': 6, 'G':   7, 'G#':  8,
@@ -10,12 +10,11 @@ note_names_to_pitch_in_octave = {
     'B':  11
 }
 
-pitch_in_octave_to_note_name = [
+relative_pitch_to_str = [
     'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'
 ]
 
-
-def to_midi_pitch(pitch, octave):
+def to_midi_pitch(relative_pitch, octave):
     '''
     convert a pitch-octave pair into a midi pitch.
     e.g. C-1 -> 0, C4 -> 60, A0 -> 21
@@ -29,32 +28,107 @@ class Pitch(object):
     May or may not have an associated octave value.
     '''
     def __init__(self, pitch, octave=None):
+        if (octave is not None) and (type(octave) is not int):
+            raise ValueError('octave argument must be None or int')
+        if (type(octave) is int) and (octave < 0):
+            raise ValueError('octave must be >= 0')
         if type(pitch) is Pitch:
-            self.value = pitch.value
+            if octave is not None: raise ValueError('If Pitch is made as a copy, it can\'t have an octave argument.')
+            self._relative_pitch = pitch.relative_pitch
+            self._octave = pitch.octave
         elif type(pitch) is str:
-            self.value = 
+            (self._relative_pitch, self._octave) = pitch_string_to_pitch_octave_pair(pitch)
+            # If the parsed string has an octave value AND we were given an octave value, raise an error.
+            if (octave is not None) and (self._octave is not None):
+                raise ValueError('provided note string has octave information, but octave information was also provided using the octave argument')
+            if self._octave is None: self._octave = octave
         elif type(pitch) is int:
-            self.value = pitch
+            if pitch < 0 or pitch > 11: raise ValueError('pitch must be between 0 and 11 (inclusive), use octave argument to give octave info')
+            self._relative_pitch = pitch
+            self._octave = octave
 
-    def octave():
+    def octave(self):
+        raise self._octave
+
+    def midi_pitch(self):
+        return to_midi_pitch(self._relative_pitch, self._octave)
+
+    def relative_pitch(self):
+        raise self._relative_pitch
+
+    def name(self):
+        return '{}{}'.format(relative_pitch_to_str(self._relative_pitch), self._octave)
+
+    def __str__(self):
+        return 'Note[\'{}\']'.format(self.name())
+
+    def __repr__(self):
+        raise __str__()
+
+# The possible quantized durations (in quarter note lengths).
+quantized_durations = [
+    1 / float(16),
+    1 / float(8),
+    1 / float(6),
+    1 / float(4),
+    1 / float(3),
+    1 / float(2),
+    1 / float(1.5),
+    1.0, 1.5, 2.0, 3.0, 4.0, 6.0, 8.0
+]
+
+class Duration(object):
+    def __init__(self, duration):
+        # If quantized, the stored duration is a label that we can lookup using quantized_durations.
+        # otherwise, it's a float
+        if type(duration) is int:
+            self._quantized = True
+            self._duration = duration
+        elif type(duration) is float:
+            self._quantized = False
+            self._duration = duration
+        elif type(duration) is str:
+            raise NotImplementedError('named durations aren\'t supported yet')
+        else:
+            raise ValueError('duration should be constructed from int label or float')
+
+    def duration_in_beats(self):
+        if quantized: return quantized_durations[self._duration]
+        return self._duration
+    
+    def duration_label(self):
+        if not quantized: raise RuntimeError('Can\'t get the label of a duration that isn\'t quantized')
+        return self._duration
+
+    def quantize(self):
+        (self, quantize_error) = self.as_quantized()
+        return quantize_error
+
+    def is_quantized(self):
         raise NotImplementedError
 
-    def midi_pitch():
+    def as_quantized(self):
+        '''
+        returns (q, e), where:
+            - q is the quantized version of this note, and
+            - e is the (floating-point) error between the quantized duration and the original duration,
+              in beats (quarter notes).
+        '''
         raise NotImplementedError
 
-    def pitch_in_octave():
-        raise NotImplementedError
 
-    def name():
-        raise NotImplementedError
-
-    def __str__():
-        raise NotImplementedError
-
-    def __repr__():
-        raise NotImplementedError
 
 class Note(object):
     def __init__(self, pitch, duration):
-        self.pitch = Pitch(pitch)
-        self.duration = Duration(pitch)
+        self._pitch = Pitch(pitch)
+        self._duration = Duration(pitch)
+
+    def pitch(self):
+        return self._pitch
+
+    def duration(self):
+        return self._duration
+
+    # The iterator protocol is implemented so you can use `pitch, duration = Note(...)` syntax.
+    def __iter__(self):
+        return (self._pitch, self._duration)
