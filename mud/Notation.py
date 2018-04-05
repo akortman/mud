@@ -97,6 +97,10 @@ class Pitch(object):
         pitch = cls.str_to_relative_pitch[pitch_part]
         return pitch, octave
 
+    @classmethod
+    def from_music21(cls, pitch):
+        return cls('{}{}'.format(pitch.name.replace('-', 'b'), pitch.octave))
+
 class Duration(object):
     '''
     A class representing a musical duration.
