@@ -227,6 +227,30 @@ class Note(object):
         return self.__str__()
 
     def __eq__(self, other):
-        if type(other) is not Note:
+        if type(other) is not self.__class__:
             return False
         return self._pitch == other._pitch and self._duration == other._duration
+
+class Rest(object):
+    def __init__(self, duration, quantized=True):
+        self.set_duration(duration, quantized=quantized)
+
+    def pitch(self):
+        return None
+
+    def duration(self):
+        return self._duration
+
+    def set_duration(self, duration, quantized=True):
+        self._duration = Duration(duration, quantized=quantized)
+
+    def __str__(self):
+        return 'Rest[{}]'.format(self._duration)
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __eq__(self, other):
+        if type(other) is not self.__class__:
+            return False
+        return self._duration == other._duration
