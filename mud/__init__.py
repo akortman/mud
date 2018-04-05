@@ -1,3 +1,3 @@
-from Notation import *
-from Event import *
-from Span import *
+from Notation import Note, Duration, Rest, Pitch
+from Event import Event
+from Span import Span
