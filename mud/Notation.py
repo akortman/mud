@@ -144,7 +144,7 @@ class Duration(object):
         if quantized:
             self.quantize()
 
-    def duration_in_beats(self):
+    def in_beats(self):
         if self._quantized:
             return Duration.quantized_durations[self._label]
         return self._duration

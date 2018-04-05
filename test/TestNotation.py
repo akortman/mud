@@ -43,13 +43,13 @@ class TestDuration(unittest.TestCase):
         self.assertTrue(d.is_quantized())
         self.assertEqual(d, mud.Duration(2, quantized=True))
         self.assertEqual(d, mud.Duration(2.0))
-        self.assertAlmostEqual(d.duration_in_beats(), 2.0)
+        self.assertAlmostEqual(d.in_beats(), 2.0)
         self.assertEqual(d.duration_label(), 9)
 
     def test_unquantized(self):
         d = mud.Duration(2.3, quantized=False)
         self.assertNotEqual(d, mud.Duration(2.3, quantized=True))
-        self.assertAlmostEqual(d.duration_in_beats(), 2.3)
+        self.assertAlmostEqual(d.in_beats(), 2.3)
         self.assertFalse(d.is_quantized())
         with self.assertRaises(ValueError):
             d.duration_label()
@@ -58,7 +58,7 @@ class TestDuration(unittest.TestCase):
         self.assertFalse(d.is_quantized())
         self.assertTrue(q.is_quantized())
         self.assertNotEqual(d, q)
-        self.assertAlmostEqual(q.duration_in_beats(), 2.0)
+        self.assertAlmostEqual(q.in_beats(), 2.0)
         self.assertAlmostEqual(error, 0.3)
 
         d.quantize()
@@ -78,7 +78,7 @@ class TestNote(unittest.TestCase):
 
         self.assertEqual(n.duration(), mud.Duration(0.5))
         self.assertTrue(n.duration().is_quantized())
-        self.assertAlmostEqual(n.duration().duration_in_beats(), 0.5)
+        self.assertAlmostEqual(n.duration().in_beats(), 0.5)
         self.assertEqual(n.duration().duration_label(), 5)
 
     def test_edit_members(self):
@@ -89,19 +89,19 @@ class TestNote(unittest.TestCase):
         self.assertEqual(n.pitch().name(), 'C2')
 
         self.assertFalse(n.duration().is_quantized())
-        self.assertAlmostEqual(n.duration().duration_in_beats(), 0.55)
+        self.assertAlmostEqual(n.duration().in_beats(), 0.55)
 
         err = n.duration().quantize()
 
         self.assertAlmostEqual(err, 0.55 - 0.5)
-        self.assertAlmostEqual(err, 0.55 - n.duration().duration_in_beats())
+        self.assertAlmostEqual(err, 0.55 - n.duration().in_beats())
         self.assertEqual(n.duration(), mud.Duration(0.5))
 
 class TestRest(unittest.TestCase):
     def test(self):
         r = mud.Rest(0.25)
         self.assertEqual(r.pitch(), None)
-        self.assertAlmostEqual(r.duration().duration_in_beats(), 0.25)
+        self.assertAlmostEqual(r.duration().in_beats(), 0.25)
         self.assertEqual(r, mud.Rest(0.251, quantized=True))
         self.assertNotEqual(r, mud.Rest(0.252, quantized=False))
 
