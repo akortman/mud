@@ -81,6 +81,13 @@ class TestNote(unittest.TestCase):
         self.assertAlmostEqual(n.duration().in_beats(), 0.5)
         self.assertEqual(n.duration().duration_label(), 5)
 
+    def test_unpack(self):
+        n = mud.Note('Ab2', 4)
+        (p, d) = n
+        self.assertEqual(p.relative_pitch(), mud.Pitch.str_to_relative_pitch['Ab'])
+        self.assertEqual(p.octave(), 2)
+        self.assertAlmostEqual(d.in_beats(), 4.0)
+
     def test_edit_members(self):
         n = mud.Note('C1', 0.55, quantized=False)
 
