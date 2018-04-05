@@ -97,5 +97,13 @@ class TestNote(unittest.TestCase):
         self.assertAlmostEqual(err, 0.55 - n.duration().duration_in_beats())
         self.assertEqual(n.duration(), mud.Duration(0.5))
 
+class TestRest(unittest.TestCase):
+    def test(self):
+        r = mud.Rest(0.25)
+        self.assertEqual(r.pitch(), None)
+        self.assertAlmostEqual(r.duration().duration_in_beats(), 0.25)
+        self.assertEqual(r, mud.Rest(0.251, quantized=True))
+        self.assertNotEqual(r, mud.Rest(0.252, quantized=False))
+
 if __name__ == '__main__':
     unittest.main()
