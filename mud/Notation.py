@@ -189,4 +189,6 @@ class Note(object):
         return (self._pitch, self._duration).__iter__()
 
     def __eq__(self, other):
-        return # TODO
+        if type(other) is not Note:
+            return False
+        return self._pitch == other._pitch and self._duration == other._duration
