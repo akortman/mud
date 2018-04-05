@@ -46,6 +46,9 @@ class Span(object):
     def length(self):
         return self.calculate_span_length()
 
+    def offset(self):
+        return self._offset
+
     def sort(self):
         self._events.sort(key=lambda e: e.time().in_beats())
 
