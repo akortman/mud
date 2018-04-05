@@ -1,5 +1,6 @@
 import unittest
 import mud
+import music21 as mu
 
 class TestPitch(unittest.TestCase):
     def test_create_relative(self):
@@ -36,6 +37,13 @@ class TestPitch(unittest.TestCase):
         self.assertEqual(p, mud.Pitch(8, 6))
         self.assertEqual(p, mud.Pitch('G#6'))
         self.assertEqual(p, mud.Pitch('Ab6'))
+
+    def test_from_music21(self):
+        pitch_strs = {'G#4', 'C7'}
+        for pstr in pitch_strs:
+            mu21p = mu.pitch.Pitch(pstr)
+            mudp = mud.Pitch(pstr)
+            self.assertEqual(mud.Pitch.from_music21(mu21p), mudp)
 
 class TestDuration(unittest.TestCase):
     def test_quantized(self):
