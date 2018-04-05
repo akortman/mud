@@ -3,10 +3,10 @@ A span is a range of musical events, particularly notes and rests.
 '''
 
 from Event import Event
-from Notation import *
+from Notation import Duration
 
 class Span(object):
-    def __init__(self, events, length=None, pad_to_length=True, sorted=True):
+    def __init__(self, events, length=None, sort=True):
         '''
         events must be a list of Events, or a list of (e, t) tuples,
         where e is a the object wrapped by the event (Note, Rest, etc)
@@ -22,10 +22,9 @@ class Span(object):
         if length is not None:
             actual_length = self.calculate_span_length()
             assert actual_length <= length + 0.0001
-            if pad_to_length:
-                self.pad_to_length(length)
+            self.pad_to_length(length)
             assert actual_length >= length - 0.0001
-        if sorted:
+        if sort:
             self.sort()
 
     def calculate_span_length(self):
