@@ -53,7 +53,7 @@ class Pitch(object):
         return Pitch.to_midi_pitch(self._relative_pitch, self._octave)
 
     def relative_pitch(self):
-        raise self._relative_pitch
+        return self._relative_pitch
 
     def name(self):
         if self._octave is None:
@@ -94,7 +94,7 @@ class Pitch(object):
             pitch_part, octave_part = pitchstr[:pos], pitchstr[pos:]
             assert len(pitch_part) + len(octave_part) == len(pitchstr)
         octave = int(octave_part) if octave_part is not None else None
-        pitch = cls.relative_pitch_to_str.index(pitch_part)
+        pitch = cls.str_to_relative_pitch[pitch_part]
         return pitch, octave
 
 class Duration(object):
@@ -119,6 +119,16 @@ class Duration(object):
         # otherwise, it's a float
         if type(duration) is str:
             raise NotImplementedError('named durations aren\'t supported yet')
+            
+        if type(duration) is self.__class__:
+            assert _label is None
+            self._quantized = duration._quantized
+            self._duration = duration._duration
+            self._label = duration._label
+            if quantized and not duration._quantized:
+                self.quantize()
+            return
+
         if _label is not None:
             assert type(_label) is int
             self._quantized = True
@@ -174,15 +184,21 @@ class Duration(object):
         return self._duration == other._duration
 
 class Note(object):
-    def __init__(self, pitch, duration):
-        self._pitch = Pitch(pitch)
-        self._duration = Duration(pitch)
+    def __init__(self, pitch, duration, quantized=True):
+        self.set_pitch(pitch)
+        self.set_duration(duration, quantized=quantized)
 
     def pitch(self):
         return self._pitch
 
     def duration(self):
         return self._duration
+
+    def set_pitch(self, pitch):
+        self._pitch = Pitch(pitch)
+
+    def set_duration(self, duration, quantized=True):
+        self._duration = Duration(duration, quantized=quantized)
 
     # The iterator protocol is implemented so you can use `pitch, duration = Note(...)` syntax.
     def __iter__(self):
