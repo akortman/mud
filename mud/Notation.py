@@ -131,15 +131,18 @@ class Duration(object):
 
         if _label is not None:
             assert type(_label) is int
+            assert duration is None
+            assert quantized is True
             self._quantized = True
             self._duration = Duration.quantized_durations[_label]
             self._label = _label
-        else:
-            self._quantized = False
-            self._duration = float(duration)
-            self._label = None
-            if quantized:
-                self.quantize()
+            return
+        
+        self._quantized = False
+        self._duration = float(duration)
+        self._label = None
+        if quantized:
+            self.quantize()
 
     def duration_in_beats(self):
         if self._quantized:
@@ -152,7 +155,10 @@ class Duration(object):
         return self._label
 
     def quantize(self):
-        (self, quantize_error) = self.as_quantized()
+        (q, quantize_error) = self.as_quantized()
+        self._duration = q._duration
+        self._label = q._label
+        self._quantized = True
         return quantize_error
 
     def is_quantized(self):
@@ -176,8 +182,18 @@ class Duration(object):
         return (Duration(duration=None, _label=new_duration_label),
                 errors[new_duration_label])
 
+    def __str__(self):
+        if self._quantized:
+            return 'Duration[quantized, duration={}, label={}]'.format(self._duration, self._label)
+        return 'Duration[unquantized, duration={}]'.format(self._duration)
+
+    def __repr__(self):
+        return self.__str__()
+    
     def __eq__(self, other):
         if type(other) is not self.__class__:
+            return False
+        if self._quantized != other._quantized:
             return False
         if self._quantized and other._quantized:
             return self._label == other._label
@@ -203,6 +219,12 @@ class Note(object):
     # The iterator protocol is implemented so you can use `pitch, duration = Note(...)` syntax.
     def __iter__(self):
         return (self._pitch, self._duration).__iter__()
+
+    def __str__(self):
+        return 'Note[{}, {}]'.format(self._pitch, self._duration)
+
+    def __repr__(self):
+        return self.__str__()
 
     def __eq__(self, other):
         if type(other) is not Note:
