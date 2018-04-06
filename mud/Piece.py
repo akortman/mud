@@ -9,9 +9,7 @@ from Event import Event
 
 class Piece(object):
     def __init__(self, piece=None):
-        self._bars = []
-        self._tonic = None
-        self._key_mode = None
+        self.init_empty()
         if piece is None:
             return
         elif type(piece) is str:
@@ -19,11 +17,17 @@ class Piece(object):
         else:
             raise NotImplementedError('currently Piece only supports loading from file or empty initialization')
 
+    def init_empty(self):
+        self._bars = []
+        self._tonic = None
+        self._key_mode = None
+
     def load_file(self, path, save_key=False, transpose_to=None):
         s = mu.converter.parse(path)
         return self.from_music21_stream(s, save_key, transpose_to)
 
     def from_music21_stream(self, s, save_key=False, transpose_to=None):
+        self.init_empty()
         s = s.flat
 
         # Get the key of the piece if required.
@@ -50,14 +54,11 @@ class Piece(object):
         # Convert the music21 stream, each bar becomes a mud.Span
         measures = s.getElementsByClass('Measure')
         for m in measures:
-            if m is None:
-                break
-            
             events = []
             span_offset = Duration(m.offset)
             for elem in m.notesAndRests:
                 if elem.isNote:
-                    event_data = Note(elem.name, elem.duration.quarterLength)
+                    event_data = Note(elem.nameWithOctave, elem.duration.quarterLength)
                 else:
                     event_data = Rest(elem.duration.quarterLength)
                 events.append(Event(event_data,
@@ -72,6 +73,15 @@ class Piece(object):
         for bar in self._bars:
             for event in bar:
                 yield event
+
+    def count_events(self):
+        return sum(b.num_events() for b in self._bars)
+
+    def num_bars(self):
+        return len(self._bars)
+
+    def length_in_beats(self):
+        return sum(b.length() for b in self._bars)
 
     def bars(self):
         return self._bars
