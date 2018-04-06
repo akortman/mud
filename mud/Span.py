@@ -16,10 +16,10 @@ class Span(object):
         self._offset = offset
         for e in events:
             if type(e) is Event:
-                self._events.append(e)
+                self.append_event(e)
             else:
                 assert type(e[1]) is Duration
-                self._events.append(Event(e[0], e[1]))
+                self.append_event(Event(e[0], e[1]))
         if length is not None:
             actual_length = self.calculate_span_length()
             assert actual_length <= length + 0.0001
@@ -27,6 +27,14 @@ class Span(object):
             assert actual_length >= length - 0.0001
         if sort:
             self.sort()
+
+    def append_event(self, event):
+        events_requiring_nonzero_duration = { Note, Rest }
+        if (type(event) in events_requiring_nonzero_duration
+            and event.duration.is_zero()):
+            # disallow events with 0 duration from being in the Span
+            return
+        self._events.append(event)
 
     def calculate_span_length(self):
         end_positions = [event.time().in_beats()
@@ -42,6 +50,9 @@ class Span(object):
         if to_pad <= 0:
             return
         self._events.append(Event(Rest(to_pad), Duration(actual_length)))
+
+    def num_events(self):
+        return len(self._events)
 
     def length(self):
         return self.calculate_span_length()
