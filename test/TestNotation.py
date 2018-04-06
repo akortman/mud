@@ -52,7 +52,7 @@ class TestDuration(unittest.TestCase):
         self.assertEqual(d, mud.Duration(2, quantized=True))
         self.assertEqual(d, mud.Duration(2.0))
         self.assertAlmostEqual(d.in_beats(), 2.0)
-        self.assertEqual(d.duration_label(), 9)
+        self.assertEqual(d.duration_label(), 10)
 
     def test_unquantized(self):
         d = mud.Duration(2.3, quantized=False)
@@ -87,7 +87,7 @@ class TestNote(unittest.TestCase):
         self.assertEqual(n.duration(), mud.Duration(0.5))
         self.assertTrue(n.duration().is_quantized())
         self.assertAlmostEqual(n.duration().in_beats(), 0.5)
-        self.assertEqual(n.duration().duration_label(), 5)
+        self.assertEqual(n.duration().duration_label(), 6)
 
     def test_unpack(self):
         n = mud.Note('Ab2', 4)
