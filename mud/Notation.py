@@ -14,7 +14,10 @@ class Pitch(object):
         'D#':  3, 'Eb': 3, 'E':   4, 'F':   5,
         'F#':  6, 'Gb': 6, 'G':   7, 'G#':  8,
         'Ab':  8, 'A':  9, 'A#': 10, 'Bb': 10,
-        'B':  11
+        'B':  11,
+        # music21 uses '-' for flats, so we need to support this for conversions.
+        'D-':  1, 'E-': 3, 'G-':  6, 'A-':  8,
+        'B-': 10,
     }
 
     relative_pitch_to_str = [
@@ -108,6 +111,7 @@ class Duration(object):
     '''
     # The possible quantized durations (in quarter note lengths).
     quantized_durations = [
+        0.0,
         1 / float(16),
         1 / float(8),
         1 / float(6),
@@ -185,6 +189,9 @@ class Duration(object):
         new_duration_label = errors.index(min(errors))
         return (Duration(duration=None, _label=new_duration_label),
                 errors[new_duration_label])
+
+    def is_zero(self):
+        return abs(self._duration) < 0.000001
 
     def __str__(self):
         if self._quantized:
