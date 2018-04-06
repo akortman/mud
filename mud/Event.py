@@ -24,6 +24,10 @@ class Event(object):
     def time(self):
         return self._time
 
+    # iter for (event, time) unpacking
+    def __iter__(self):
+        return (self._event, self._time).__iter__()
+
     def __str__(self):
         return 'Event[{}, time={}]'.format(self._event, self._time)
 
