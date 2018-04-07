@@ -211,9 +211,14 @@ class Duration(object):
         return self._duration == other._duration
 
 class Note(object):
-    def __init__(self, pitch, duration, quantized=True):
-        self.set_pitch(pitch)
-        self.set_duration(duration, quantized=quantized)
+    def __init__(self, pitch=None, duration=None, note=None, quantized=None):
+        if note is not None:
+            assert pitch is None and duration is None
+            self.set_pitch(note.pitch())
+            self.set_duration(note.duration(), quantized=note.duration.is_quantized() if quantized is None else quantized)
+        else:
+            self.set_pitch(pitch)
+            self.set_duration(duration, quantized=True if quantized is None else quantized)
 
     def pitch(self):
         return self._pitch
