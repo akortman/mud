@@ -101,3 +101,33 @@ class Piece(object):
             for event in bar:
                 event.unwrap().duration().quantize()
                 event.time().quantize()
+
+    def pprint(self):
+        print('Piece: [')
+        print('  tonic: {},\n'.format(self._tonic))
+        print('  mode: {},\n'.format(self._key_mode))
+        print('  bars: [')
+        for i, bar in enumerate(self._bars):
+            print('    {{Bar {}}} ({} to {}): ['.format(i, bar.offset().in_beats(), bar.offset().in_beats() + bar.length()))
+            for j, event in enumerate(bar):
+                print('      {{Event {}}} {}'.format(event.time().in_beats(), event.unwrap()))
+            print('    ]')
+        print('  ]')
+        print(']')
+
+    def pretty_description(self):
+        pad = '    '
+        s = ''
+        s += 'mud.Piece[\n'
+        s += pad + 'tonic: {},\n'.format(self._tonic)
+        s += pad + 'mode: {},\n'.format(self._key_mode)
+        for i, bar in enumerate(self._bars):
+            s += pad + '[{}] {},\n'.format(i, str(bar))
+        s += ']\n'
+        return s
+    
+    def __str__(self):
+        return self.description()
+
+    def __repr__(self):
+        return self.__str__()
