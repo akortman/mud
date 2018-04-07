@@ -54,18 +54,16 @@ class Piece(object):
 
         # Convert the music21 stream, each bar becomes a mud.Span
         measures = s.getElementsByClass('Measure')
-        for m in measures:
+        for i, m in enumerate(measures):
             events = []
-            span_offset = Duration(m.offset)
             for elem in m.notesAndRests:
                 if elem.isNote:
                     event_data = Note(elem.nameWithOctave, elem.duration.quarterLength)
                 else:
                     event_data = Rest(elem.duration.quarterLength)
-                events.append(Event(event_data,
-                                    Duration(elem.offset - span_offset.in_beats())))
+                events.append(Event(event_data, Duration(elem.offset)))
             
-            span = Span(events, offset=span_offset)
+            span = Span(events, offset=m.offset)
             self._bars.append(span)
 
         return self
@@ -110,7 +108,7 @@ class Piece(object):
         if self._key_mode is not None:
             print('    mode: {}'.format(self._key_mode))
         for i, bar in enumerate(self._bars):
-            print('    {{Bar {}}} ({} to {}):'.format(i, bar.offset().in_beats(), bar.offset().in_beats() + bar.length()))
+            print('    {{Bar {}}} ({} to {}):'.format(i, bar.offset(), bar.offset() + bar.length()))
             for j, event in enumerate(bar):
                 print('        {{Event {}}} {}'.format(event.time().in_beats(), event.unwrap()))
 

@@ -13,6 +13,7 @@ class Span(object):
         and   t is a duration (the offset from the start of the span)
         '''
         self._events = []
+        assert type(offset) is int or type(offset) is float
         self._offset = offset
         for e in events:
             if type(e) is Event:
