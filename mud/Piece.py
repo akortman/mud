@@ -90,9 +90,9 @@ class Piece(object):
             raise NotImplementedError('non-int intervals not supported yet')
         raise NotImplementedError
     
-    def transpose_tonic_to(self, note):
-        if type(note) is not Note:
-            note = Note(note)
+    def transpose_tonic_to(self, pitch):
+        if type(pitch) is not Pitch:
+            pitch = Pitch(pitch)
         raise NotImplementedError
     
     def quantize_events(self, max_error=None):
@@ -124,7 +124,7 @@ class Piece(object):
         return s
     
     def __str__(self):
-        return self.description()
+        return self.pretty_description()
 
     def __repr__(self):
         return self.__str__()
