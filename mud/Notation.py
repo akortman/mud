@@ -64,7 +64,7 @@ class Pitch(object):
         return '{}{}'.format(self.__class__.relative_pitch_to_str[self._relative_pitch], self._octave)
 
     def __str__(self):
-        return 'Note[\'{}\']'.format(self.name())
+        return 'Pitch[\'{}\']'.format(self.name())
 
     def __repr__(self):
         return self.__str__()
