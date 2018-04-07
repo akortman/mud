@@ -17,17 +17,18 @@ class Piece(object):
         else:
             raise NotImplementedError('currently Piece only supports loading from file or empty initialization')
 
-    def init_empty(self):
+    def init_empty(self, name=None):
         self._bars = []
         self._tonic = None
         self._key_mode = None
+        self._name = name
 
     def load_file(self, path, save_key=False, transpose_to=None):
         s = mu.converter.parse(path)
-        return self.from_music21_stream(s, save_key, transpose_to)
+        return self.from_music21_stream(s, save_key, transpose_to, name=path)
 
-    def from_music21_stream(self, s, save_key=False, transpose_to=None):
-        self.init_empty()
+    def from_music21_stream(self, s, save_key=False, transpose_to=None, name=None):
+        self.init_empty(name=name)
         s = s.flat
 
         # Get the key of the piece if required.
@@ -103,17 +104,15 @@ class Piece(object):
                 event.time().quantize()
 
     def pprint(self):
-        print('Piece: [')
-        print('  tonic: {},\n'.format(self._tonic))
-        print('  mode: {},\n'.format(self._key_mode))
-        print('  bars: [')
+        print('Piece: {}'.format('' if self._name is None else self._name))
+        if self._tonic is not None:
+            print('    tonic: {}'.format(self._tonic))
+        if self._key_mode is not None:
+            print('    mode: {}'.format(self._key_mode))
         for i, bar in enumerate(self._bars):
-            print('    {{Bar {}}} ({} to {}): ['.format(i, bar.offset().in_beats(), bar.offset().in_beats() + bar.length()))
+            print('    {{Bar {}}} ({} to {}):'.format(i, bar.offset().in_beats(), bar.offset().in_beats() + bar.length()))
             for j, event in enumerate(bar):
-                print('      {{Event {}}} {}'.format(event.time().in_beats(), event.unwrap()))
-            print('    ]')
-        print('  ]')
-        print(']')
+                print('        {{Event {}}} {}'.format(event.time().in_beats(), event.unwrap()))
 
     def pretty_description(self):
         pad = '    '
