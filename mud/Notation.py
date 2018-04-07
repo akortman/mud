@@ -232,7 +232,7 @@ class Note(object):
         return (self._pitch, self._duration).__iter__()
 
     def __str__(self):
-        return 'Note[\'{}\', {}]'.format(self._pitch.name(), self._duration.in_beats())
+        return 'Note [ \'{}\', {} ]'.format(self._pitch.name(), self._duration.in_beats())
 
     def __repr__(self):
         return 'Note[{}, {}]'.format(self._pitch, self._duration)
@@ -256,7 +256,7 @@ class Rest(object):
         self._duration = Duration(duration, quantized=quantized)
 
     def __str__(self):
-        return 'Rest[{}]'.format(self._duration.in_beats())
+        return 'Rest [ {} ]'.format(self._duration.in_beats())
 
     def __repr__(self):
         return 'Rest[{}]'.format(self._duration)
