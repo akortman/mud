@@ -18,5 +18,18 @@ class TestPiece(unittest.TestCase):
         self.assertEqual(duration, mud.Duration(4))
 
     def test_complex_piece(self):
+        # Canon in D violin solo from https://musescore.com/user/88585/scores/105013
         p = mud.Piece('./test/test-files/canon_in_d.mxl')
-        self.assertEqual(p.num_bars(), 137)
+        self.assertEqual(p.num_bars(), 27)
+        bar = p.bars()[22]
+        self.assertEqual(bar.num_events(), 4)
+        
+        # note 0: D, quarter note
+        note, time = bar[0]
+        self.assertEqual(note, mud.Note('D5', 1.0))
+        self.assertEqual(time, mud.Duration(0.0))
+
+        # note 3: F, quarter note
+        note, time = bar[3]
+        self.assertEqual(note, mud.Note('F#4', 1.0))
+        self.assertEqual(time, mud.Duration(3.0))
