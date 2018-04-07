@@ -232,10 +232,10 @@ class Note(object):
         return (self._pitch, self._duration).__iter__()
 
     def __str__(self):
-        return 'Note[{}, {}]'.format(self._pitch, self._duration)
+        return 'Note[\'{}\', {}]'.format(self._pitch.name(), self._duration.in_beats())
 
     def __repr__(self):
-        return self.__str__()
+        return 'Note[{}, {}]'.format(self._pitch, self._duration)
 
     def __eq__(self, other):
         if type(other) is not self.__class__:
@@ -256,10 +256,10 @@ class Rest(object):
         self._duration = Duration(duration, quantized=quantized)
 
     def __str__(self):
-        return 'Rest[{}]'.format(self._duration)
+        return 'Rest[{}]'.format(self._duration.in_beats())
 
     def __repr__(self):
-        return self.__str__()
+        return 'Rest[{}]'.format(self._duration)
 
     def __eq__(self, other):
         if type(other) is not self.__class__:
