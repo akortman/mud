@@ -8,15 +8,29 @@ from Notation import Time
 
 class Event(object):
     def __init__(self, event, time=None):
-        if type(event) is self.__class__:
+        if isinstance(event, Event):
             self._event = event._event
             self._time = event._time
             if time is not None:
                 self._time = time
         else:
-            assert time is not None
+            if time is None:
+                raise ValueError('Can\'t create Event with time as None unless creating from another Event')
             self._event = event
             self._time = Time(time)
+        assert type(self._time) is Time
+
+    def duration(self):
+        return self._event.duration()
+
+    def pitch(self):
+        return self._event.pitch()
+
+    def is_note(self):
+        return self._event.is_note()
+
+    def is_rest(self):
+        return self._event.is_rest()
 
     def unwrap(self):
         return self._event
