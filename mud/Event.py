@@ -4,7 +4,7 @@ An Event is a musical event:
     - a start time relative to the containing span
 '''
 
-from Notation import Duration
+from Notation import Time
 
 class Event(object):
     def __init__(self, event, time=None):
@@ -16,7 +16,7 @@ class Event(object):
         else:
             assert time is not None
             self._event = event
-            self._time = Duration(time)
+            self._time = Time(time)
 
     def unwrap(self):
         return self._event

@@ -96,6 +96,13 @@ class TestTime(unittest.TestCase):
         self.assertAlmostEqual(t.in_beats(), 0.0)
         self.assertEqual(t.in_resolution_steps(), 0)
 
+    def test_copy(self):
+        t = mud.Time(2.0)
+        t2 = mud.Time(t)
+        self.assertEqual(t, t2)
+        self.assertAlmostEqual(t.in_beats(), t2.in_beats())
+        self.assertEqual(t.in_resolution_steps(), t2.in_resolution_steps())
+
     def test_unquantized(self):
         pass
 

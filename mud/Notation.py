@@ -109,10 +109,14 @@ class Time(object):
     A class representing a musical time.
     '''
     def __init__(self, time, resolution=1/float(16)):
-        self._resolution = resolution
-        self._time = time
-        if resolution is not None:
-            self.quantize_to(resolution)
+        if type(time) is self.__class__:
+            self._resolution = time._resolution
+            self._time = time._time
+        else:
+            self._resolution = resolution
+            self._time = time
+            if resolution is not None:
+                self.quantize_to(resolution)
 
     def quantize_to(self, resolution):
         self._resolution = resolution

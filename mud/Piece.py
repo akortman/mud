@@ -3,7 +3,7 @@ A Piece is an entire piece of music and it's component events.
 '''
 
 import music21 as mu
-from Notation import Pitch, Duration, Note, Rest
+from Notation import Pitch, Duration, Note, Rest, Time
 from Span import Span
 from Event import Event
 
@@ -61,7 +61,7 @@ class Piece(object):
                     event_data = Note(elem.nameWithOctave, elem.duration.quarterLength)
                 else:
                     event_data = Rest(elem.duration.quarterLength)
-                events.append(Event(event_data, Duration(elem.offset)))
+                events.append(Event(event_data, Time(elem.offset)))
             
             span = Span(events, offset=m.offset)
             self._bars.append(span)
