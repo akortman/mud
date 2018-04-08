@@ -45,6 +45,7 @@ class TestPitch(unittest.TestCase):
             mudp = mud.Pitch(pstr)
             self.assertEqual(mud.Pitch.from_music21(mu21p), mudp)
 
+@unittest.skip("deprecated")
 class TestDuration(unittest.TestCase):
     def test_quantized(self):
         d = mud.Duration(2)
@@ -115,10 +116,9 @@ class TestNote(unittest.TestCase):
         self.assertEqual(n.pitch().name(), 'Ab6')
         self.assertEqual(n.pitch(), mud.Pitch(8, 6))
 
-        self.assertEqual(n.duration(), mud.Duration(0.5))
+        self.assertEqual(n.duration(), mud.Time(0.5))
         self.assertTrue(n.duration().is_quantized())
         self.assertAlmostEqual(n.duration().in_beats(), 0.5)
-        self.assertEqual(n.duration().duration_label(), 6)
 
     def test_unpack(self):
         n = mud.Note('Ab2', 4)
@@ -128,7 +128,7 @@ class TestNote(unittest.TestCase):
         self.assertAlmostEqual(d.in_beats(), 4.0)
 
     def test_edit_members(self):
-        n = mud.Note('C1', 0.55, quantized=False)
+        n = mud.Note('C1', 0.55)
 
         self.assertEqual(n.pitch().name(), 'C1')
         n.set_pitch(mud.Pitch('C2'))
@@ -141,15 +141,14 @@ class TestNote(unittest.TestCase):
 
         self.assertAlmostEqual(err, 0.55 - 0.5)
         self.assertAlmostEqual(err, 0.55 - n.duration().in_beats())
-        self.assertEqual(n.duration(), mud.Duration(0.5))
+        self.assertEqual(n.duration(), mud.Time(0.5))
 
 class TestRest(unittest.TestCase):
     def test(self):
         r = mud.Rest(0.25)
         self.assertEqual(r.pitch(), None)
         self.assertAlmostEqual(r.duration().in_beats(), 0.25)
-        self.assertEqual(r, mud.Rest(0.251, quantized=True))
-        self.assertNotEqual(r, mud.Rest(0.252, quantized=False))
+        self.assertEqual(r, mud.Rest(0.251))
 
 if __name__ == '__main__':
     unittest.main()

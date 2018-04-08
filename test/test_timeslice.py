@@ -57,11 +57,11 @@ class TestTimeSlice(unittest.TestCase):
         self.assertNotEqual(sliced_events[0],
                             mud.Event(mud.Note('C4', 0.5), mud.Time(2)))
         self.assertEqual(sliced_events[0].time(), mud.Time(2.5))
-        self.assertEqual(sliced_events[0].duration(), mud.Duration(0.5))
+        self.assertEqual(sliced_events[0].duration(), mud.Time(0.5))
         se0 = mud.SlicedEvent((2.5, 3.0), mud.Event(mud.Note('C4', 2), mud.Time(2)))
         self.assertEqual(sliced_events[0], se0)
 
         self.assertEqual(sliced_events[1].time(), mud.Time(2.5))
-        self.assertEqual(sliced_events[1].duration(), mud.Duration(0.5))
+        self.assertEqual(sliced_events[1].duration(), mud.Time(0.5))
         se1 = mud.SlicedEvent((2.5, 3.0), mud.Event(mud.Note('A4', 2), mud.Time(2)))
         self.assertEqual(sliced_events[1], se1)

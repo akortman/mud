@@ -3,6 +3,7 @@ Music notation-related classes.
 '''
 
 import copy
+from settings import settings
 
 class Pitch(object):
     '''
@@ -108,7 +109,7 @@ class Time(object):
     '''
     A class representing a musical time.
     '''
-    def __init__(self, time, resolution=1/float(16)):
+    def __init__(self, time, resolution=settings.resolution):
         if type(time) is self.__class__:
             self._resolution = time._resolution
             self._time = time._time
@@ -184,6 +185,7 @@ class Duration(object):
     ]
 
     def __init__(self, duration, quantized=True, _label=None):
+        raise Warning('Duration is deprecated for now!')
         # If quantized, the stored duration is a label that we can lookup using quantized_durations.
         # otherwise, it's a float
         if type(duration) is str:
@@ -273,14 +275,14 @@ class Duration(object):
         return self._duration == other._duration
 
 class Note(object):
-    def __init__(self, pitch=None, duration=None, note=None, quantized=None):
+    def __init__(self, pitch=None, duration=None, note=None):
         if note is not None:
             assert pitch is None and duration is None
             self.set_pitch(note.pitch())
-            self.set_duration(note.duration(), quantized=note.duration.is_quantized() if quantized is None else quantized)
+            self.set_duration(note.duration())
         else:
             self.set_pitch(pitch)
-            self.set_duration(duration, quantized=True if quantized is None else quantized)
+            self.set_duration(duration)
 
     def pitch(self):
         return self._pitch
@@ -297,8 +299,8 @@ class Note(object):
     def set_pitch(self, pitch):
         self._pitch = Pitch(pitch)
 
-    def set_duration(self, duration, quantized=True):
-        self._duration = Duration(duration, quantized=quantized)
+    def set_duration(self, duration):
+        self._duration = Time(duration)
 
     # The iterator protocol is implemented so you can use `pitch, duration = Note(...)` syntax.
     def __iter__(self):
@@ -316,8 +318,8 @@ class Note(object):
         return self._pitch == other._pitch and self._duration == other._duration
 
 class Rest(object):
-    def __init__(self, duration, quantized=True):
-        self.set_duration(duration, quantized=quantized)
+    def __init__(self, duration):
+        self.set_duration(duration)
 
     def pitch(self):
         return None
@@ -331,8 +333,8 @@ class Rest(object):
     def is_rest(self):
         return True
 
-    def set_duration(self, duration, quantized=True):
-        self._duration = Duration(duration, quantized=quantized)
+    def set_duration(self, duration):
+        self._duration = Time(duration)
 
     def __str__(self):
         return 'Rest [ {} ]'.format(self._duration.in_beats())

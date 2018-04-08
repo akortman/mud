@@ -3,7 +3,7 @@ A Piece is an entire piece of music and it's component events.
 '''
 
 import music21 as mu
-from notation import Pitch, Duration, Note, Rest, Time
+from notation import Pitch, Note, Rest, Time
 from span import Span
 from event import Event
 

@@ -8,7 +8,7 @@ class TestSpan(unittest.TestCase):
 
         event = mud.Event(n, t)
         self.assertEqual(event.unwrap(), n)
-        self.assertEqual(event.unwrap(), mud.Note('G#6', mud.Duration(2.0)))
+        self.assertEqual(event.unwrap(), mud.Note('G#6', mud.Time(2.0)))
         self.assertEqual(event.time(), t)
         self.assertEqual(event.time(), mud.Time(2.0, resolution=0.5))
 

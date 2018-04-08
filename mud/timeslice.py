@@ -2,7 +2,7 @@
 TimeSlice API provides a utility to get the information about all playing notes within a small slice of time.classmethod
 '''
 
-from notation import Duration, Time
+from notation import Time
 from event import Event
 from span import Span
 
@@ -24,7 +24,7 @@ class SlicedEvent(Event):
         self._post_continue = (self.time().in_beats() + event_length > slice_end)
         
         if self._post_continue:
-            self.unwrap().set_duration(Duration(slice_end - slice_start))
+            self.unwrap().set_duration(Time(slice_end - slice_start))
         if self._pre_continue:
             self._time = Time(slice_start)
         assert abs(self.unwrap().duration().in_beats() - (slice_end - slice_start)) < 0.00001

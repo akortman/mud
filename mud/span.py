@@ -3,14 +3,14 @@ A span is a range of musical events, particularly notes and rests.
 '''
 
 from event import Event
-from notation import Duration, Rest, Note, Pitch, Time
+from notation import Rest, Note, Pitch, Time
 
 class Span(object):
     def __init__(self, events, offset=None, length=None, sort=True):
         '''
         events must be a list of Events, or a list of (e, t) tuples,
         where e is a the object wrapped by the event (Note, Rest, etc)
-        and   t is a duration (the offset from the start of the span)
+        and   t is a mud.Time (the offset from the start of the span)
         '''
         self._events = []
         assert type(offset) is int or type(offset) is float or type(offset) is Time
@@ -50,7 +50,7 @@ class Span(object):
         to_pad = length - actual_length
         if to_pad <= 0:
             return
-        self._events.append(Event(Rest(to_pad), Duration(actual_length)))
+        self._events.append(Event(Rest(to_pad), Time(actual_length)))
 
     def num_events(self):
         return len(self._events)
