@@ -7,8 +7,8 @@ class TestPiece(unittest.TestCase):
         self.assertEqual(p.num_bars(), 1)
         self.assertEqual(p.count_events(), 1)
         bar = p.bars()[0]
-        self.assertAlmostEqual(bar.offset(), 0.0)
-        self.assertAlmostEqual(bar.length(), 4.0)
+        self.assertAlmostEqual(bar.offset().in_beats(), 0.0)
+        self.assertAlmostEqual(bar.length().in_beats(), 4.0)
         self.assertEqual(bar.num_events(), 1)
         note, time = bar[0]
         self.assertEqual(time, mud.Time(0))

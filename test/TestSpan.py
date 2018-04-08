@@ -11,8 +11,8 @@ class TestSpan(unittest.TestCase):
             (mud.Note('A4', 2), mud.Time(2)),
         ]
         span = mud.Span(events, length=4, offset=4)
-        self.assertAlmostEqual(span.length(), 4.0)
-        self.assertAlmostEqual(span.offset(), 4.0)
+        self.assertAlmostEqual(span.length().in_beats(), 4.0)
+        self.assertAlmostEqual(span.offset().in_beats(), 4.0)
 
         for i, (event, time) in enumerate(events):
             self.assertEqual(span[i], mud.Event(event, time))

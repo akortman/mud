@@ -13,8 +13,8 @@ class Span(object):
         and   t is a duration (the offset from the start of the span)
         '''
         self._events = []
-        assert type(offset) is int or type(offset) is float
-        self._offset = offset
+        assert type(offset) is int or type(offset) is float or type(offset) is Time
+        self._offset = Time(offset)
         for e in events:
             if type(e) is Event:
                 self.append_event(e)
@@ -56,7 +56,7 @@ class Span(object):
         return len(self._events)
 
     def length(self):
-        return self.calculate_span_length()
+        return Time(self.calculate_span_length())
 
     def offset(self):
         return self._offset
