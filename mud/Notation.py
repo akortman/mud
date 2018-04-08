@@ -146,8 +146,8 @@ class Time(object):
 
     def __str__(self):
         if self.is_quantized:
-            return 'Duration[{}, resolution={}]'.format(self._time, self.in_resolution_steps())
-        return 'Duration[{}]'.format(self._time)
+            return 'Time[{}, resolution={}]'.format(self._time, self.in_resolution_steps())
+        return 'Time[{}]'.format(self._time)
 
     def __repr__(self):
         return self.__str__()
@@ -288,6 +288,12 @@ class Note(object):
     def duration(self):
         return self._duration
 
+    def is_note(self):
+        return True
+        
+    def is_rest(self):
+        return False
+
     def set_pitch(self, pitch):
         self._pitch = Pitch(pitch)
 
@@ -318,6 +324,12 @@ class Rest(object):
 
     def duration(self):
         return self._duration
+        
+    def is_note(self):
+        return False
+        
+    def is_rest(self):
+        return True
 
     def set_duration(self, duration, quantized=True):
         self._duration = Duration(duration, quantized=quantized)
