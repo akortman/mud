@@ -8,12 +8,7 @@ _defaults_dict = {
 
 class _Settings(object):
     def __init__(self, **kwargs):
-        for key in kwargs:
-            self.init_required_fields()
-            self.__dict__['_{}'.format(key)] = kwargs[key]
-
-    def init_required_fields(self):
-        self._resolution = None
+        self._resolution = kwargs['resolution']
 
     @property
     def resolution(self):
