@@ -53,6 +53,7 @@ class TestDuration(unittest.TestCase):
         self.assertEqual(d, mud.Duration(2.0))
         self.assertAlmostEqual(d.in_beats(), 2.0)
         self.assertEqual(d.duration_label(), 10)
+        self.assertAlmostEqual(d.resolution(), 1/16.0)
 
     def test_unquantized(self):
         d = mud.Duration(2.3, quantized=False)
@@ -73,6 +74,29 @@ class TestDuration(unittest.TestCase):
         self.assertEqual(d, q)
     
     def test_label_init(self):
+        pass
+
+class TestTime(unittest.TestCase):
+    def test_quantized(self):
+        t = mud.Time(2.0, resolution=1/8.0)
+        self.assertTrue(t.is_quantized())
+        self.assertEqual(t, mud.Time(2.0, resolution=1/8.0))
+        self.assertEqual(t, mud.Time(2.0, resolution=1/4.0))
+        self.assertNotEqual(t, mud.Time(4.0, resolution=1/4.0))
+        self.assertNotEqual(t, mud.Time(1.0, resolution=1/8.0))
+        self.assertAlmostEqual(t.in_beats(), 2.0)
+        self.assertEqual(t.in_resolution_steps(), 16)
+        
+    def test_zero(self):
+        t = mud.Time(0.0, resolution=1/16.0)
+        self.assertTrue(t.is_quantized())
+        self.assertAlmostEqual(t.resolution(), 1/16.0)
+        self.assertEqual(t, mud.Time(0.0))
+        self.assertEqual(t, mud.Time(0.0, resolution=1.0))
+        self.assertAlmostEqual(t.in_beats(), 0.0)
+        self.assertEqual(t.in_resolution_steps(), 0)
+
+    def test_unquantized(self):
         pass
 
 class TestNote(unittest.TestCase):
