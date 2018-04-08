@@ -24,6 +24,18 @@ class Event(object):
     def time(self):
         return self._time
 
+    def in_span_range(self, range_):
+        range_start, range_end = range_
+        if range_start >= range_end:
+            raise ValueError('invalid range {} to {}'.format(range_start, range_end))
+        event_start = self._time.in_beats()
+        event_end = self._time.in_beats() + self._event.duration().in_beats()
+        if event_start <= range_start and event_end <= range_start:
+            return False
+        if event_start >= range_end and event_end >= range_end:
+            return False
+        return True
+
     # iter for (event, time) unpacking
     def __iter__(self):
         return (self._event, self._time).__iter__()
