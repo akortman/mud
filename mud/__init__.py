@@ -1,5 +1,5 @@
-from Notation import Note, Duration, Rest, Pitch, Time
-from Event import Event
-from Span import Span
-from Piece import Piece
-from TimeSlice import SlicedEvent, TimeSlice
+from notation import Note, Duration, Rest, Pitch, Time
+from event import Event
+from span import Span
+from piece import Piece
+from timeslice import SlicedEvent, TimeSlice

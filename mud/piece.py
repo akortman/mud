@@ -3,9 +3,9 @@ A Piece is an entire piece of music and it's component events.
 '''
 
 import music21 as mu
-from Notation import Pitch, Duration, Note, Rest, Time
-from Span import Span
-from Event import Event
+from notation import Pitch, Duration, Note, Rest, Time
+from span import Span
+from event import Event
 
 class Piece(object):
     def __init__(self, piece=None):
