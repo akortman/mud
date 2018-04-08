@@ -128,7 +128,7 @@ class TestNote(unittest.TestCase):
         self.assertAlmostEqual(d.in_beats(), 4.0)
 
     def test_edit_members(self):
-        n = mud.Note('C1', 0.55)
+        n = mud.Note('C1', mud.Time(0.55, resolution=None))
 
         self.assertEqual(n.pitch().name(), 'C1')
         n.set_pitch(mud.Pitch('C2'))

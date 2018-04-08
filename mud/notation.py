@@ -119,9 +119,14 @@ class Time(object):
             if resolution is not None:
                 self.quantize_to(resolution)
 
+    def quantize(self):
+        return self.quantize_to(resolution=settings.resolution)
+
     def quantize_to(self, resolution):
+        t = self._time
         self._resolution = resolution
         self._time = resolution * round(self._time / resolution)
+        return abs(t - self._time)
 
     def resolution(self):
         return self._resolution
