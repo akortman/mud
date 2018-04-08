@@ -104,9 +104,66 @@ class Pitch(object):
     def from_music21(cls, pitch):
         return cls('{}{}'.format(pitch.name.replace('-', 'b'), pitch.octave))
 
+class Time(object):
+    '''
+    A class representing a musical time.
+    '''
+    def __init__(self, time, resolution=1/float(16)):
+        self._resolution = resolution
+        self._time = time
+        if resolution is not None:
+            self.quantize_to(resolution)
+
+    def quantize_to(self, resolution):
+        self._resolution = resolution
+        self._time = resolution * round(self._time / resolution)
+
+    def resolution(self):
+        return self._resolution
+
+    def in_resolution_steps(self):
+        if self._resolution is None:
+            raise ValueError('Can\'t give number of resolution steps in unquantized Time')
+        return self._time / self._resolution
+
+    def in_beats(self):
+        return self._time
+
+    def is_quantized(self):
+        return self._resolution is not None
+
+    def as_quantized(self, resolution):
+        new = copy.copy(self)
+        new.quantize_to(resolution)
+        return new
+
+    def is_zero(self):
+        return abs(self._time) < 0.000001
+
+    def __str__(self):
+        if self.is_quantized:
+            return 'Duration[{}, resolution={}]'.format(self._time, self.in_resolution_steps())
+        return 'Duration[{}]'.format(self._time)
+
+    def __repr__(self):
+        return self.__str__()
+    
+    def __eq__(self, other):
+        if type(other) is not self.__class__:
+            return False
+        if self._resolution == other._resolution:
+            if self._resolution is not None:
+                return self.in_resolution_steps() == other.in_resolution_steps()
+            return self._time == other._time
+        # Take the smallest-resolution of the two times, and quantize them to both.
+        res = min(self._resolution, other._resolution)
+        a = self.as_quantized(res)
+        b = other.as_quantized(res)
+        return a.in_resolution_steps() == b.in_resolution_steps()
+
 class Duration(object):
     '''
-    A class representing a musical duration.
+    A class representing the duration of a musical event.
     Can be quantized or unquantized.
     '''
     # The possible quantized durations (in quarter note lengths).
@@ -151,6 +208,10 @@ class Duration(object):
         self._label = None
         if quantized:
             self.quantize()
+    
+    def resolution(self):
+        elements = [elem for elem in self.__class__.quantized_durations if elem != 0.0]
+        return min(elements)
 
     def in_beats(self):
         if self._quantized:
@@ -189,9 +250,6 @@ class Duration(object):
         new_duration_label = errors.index(min(errors))
         return (Duration(duration=None, _label=new_duration_label),
                 errors[new_duration_label])
-
-    def is_zero(self):
-        return abs(self._duration) < 0.000001
 
     def __str__(self):
         if self._quantized:
