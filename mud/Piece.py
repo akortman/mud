@@ -69,6 +69,7 @@ class Piece(object):
         return self
 
     def events(self):
+        raise NotImplementedError
         for bar in self._bars:
             for event in bar:
                 yield event
