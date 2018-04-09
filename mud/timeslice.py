@@ -4,7 +4,6 @@ TimeSlice API provides a utility to get the information about all playing notes 
 
 from notation import Time
 from event import Event
-from span import Span
 
 class SlicedEvent(Event):
     '''
@@ -54,7 +53,7 @@ class SlicedEvent(Event):
         return False
 
 class TimeSlice(object):
-    def __init__(self, span, slice_range):
+    def __init__(self, span_events, slice_range):
         # The slice stores the unchanged events that overlap with the slice
         # (ie each Event may have start and end times outside of the slice).
         # These are sliced on-demand.
@@ -62,7 +61,7 @@ class TimeSlice(object):
             raise ValueError('slice range must have 2 elements')
         self._slice_range = slice_range
         self._events = []
-        for event in span:
+        for event in span_events:
             if event.in_span_range(slice_range):
                 self._events.append(event)
 

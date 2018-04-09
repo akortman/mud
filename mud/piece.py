@@ -69,7 +69,7 @@ class Piece(object):
         return self
 
     def as_span(self):
-        return Span.concat(*self._events)
+        return Span.concat(*self._bars)
 
     def events(self):
         raise NotImplementedError

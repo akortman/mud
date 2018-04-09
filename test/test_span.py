@@ -58,3 +58,30 @@ class TestSpan(unittest.TestCase):
             (mud.Note('C4', 1), mud.Time(1)),
         ]
 
+    def test_slice(self):
+        span = mud.Span([
+            (mud.Note('C4', 1), mud.Time(0)),
+            (mud.Note('G5', 1), mud.Time(0)),
+            (mud.Rest(      1), mud.Time(1)),
+            (mud.Note('C4', 2), mud.Time(2)),
+            (mud.Note('A4', 2), mud.Time(2)),
+        ])
+
+        ts = span.get_slice((0.0, 0.5))
+        self.assertEqual(ts.num_events(), 2)
+        self.assertTrue(ts.is_atomic_slice())
+        ts = list(ts.sliced_events())
+        self.assertEqual(ts[0].time(),      mud.Time(0.0))
+        self.assertEqual(ts[0].duration(),  mud.Time(0.5))
+        self.assertEqual(ts[0].pitch(),     mud.Pitch('C4'))
+        self.assertEqual(ts[1].time(),      mud.Time(0.0))
+        self.assertEqual(ts[1].duration(),  mud.Time(0.5))
+        self.assertEqual(ts[1].pitch(),     mud.Pitch('G5'))
+        
+        ts = span.get_slice((1.5, 2.5))
+        self.assertEqual(ts.num_events(), 3)
+        self.assertFalse(ts.is_atomic_slice())
+
+        ts = list(span.generate_slices(0.5))
+        self.assertAlmostEqual(len(ts), 8)
+        self.assertAlmostEqual(float(len(ts)), span.length().in_beats() / 0.5)\

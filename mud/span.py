@@ -4,6 +4,7 @@ A span is a range of musical events, particularly notes and rests.
 
 from event import Event
 from notation import Rest, Note, Pitch, Time
+from timeslice import TimeSlice
 
 class Span(object):
     def __init__(self, events, offset=0, length=None, sort=True):
@@ -64,6 +65,15 @@ class Span(object):
 
     def sort(self):
         self._events.sort(key=lambda e: e.time().in_beats())
+
+    def get_slice(self, slice_range):
+        return TimeSlice(self, slice_range)
+
+    def generate_slices(self, slice_resolution):
+        t = 0.0
+        while t < self.calculate_span_length():
+            yield self.get_slice((t, t + slice_resolution))
+            t += slice_resolution
 
     def __getitem__(self, key):
         return self._events[key]
