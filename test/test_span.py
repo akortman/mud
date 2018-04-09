@@ -84,4 +84,4 @@ class TestSpan(unittest.TestCase):
 
         ts = list(span.generate_slices(0.5))
         self.assertAlmostEqual(len(ts), 8)
-        self.assertAlmostEqual(float(len(ts)), span.length().in_beats() / 0.5)\
+        self.assertAlmostEqual(float(len(ts)), span.length().in_beats() / 0.5)
