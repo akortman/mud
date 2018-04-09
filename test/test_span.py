@@ -40,3 +40,21 @@ class TestSpan(unittest.TestCase):
         self.assertAlmostEqual(span_concat.offset().in_beats(), 0.0)
         for i, (event, time) in enumerate(events_target):
             self.assertEqual(span_concat[i], mud.Event(event, time))
+    
+    @unittest.skip("incomplete")
+    def test_overlay(self):
+        span_a = mud.Span([
+            (mud.Note('C4', 1), mud.Time(0)),
+            (mud.Note('G5', 1), mud.Time(1)),
+        ])
+        span_b = mud.Span([
+            (mud.Note('A4', 1), mud.Time(0)),
+            (mud.Note('C4', 1), mud.Time(1)),
+        ])
+        events_target = [
+            (mud.Note('C4', 1), mud.Time(0)),
+            (mud.Note('A4', 1), mud.Time(0)),
+            (mud.Note('G5', 1), mud.Time(1)),
+            (mud.Note('C4', 1), mud.Time(1)),
+        ]
+

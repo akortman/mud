@@ -111,4 +111,5 @@ class Span(object):
 
     @classmethod
     def overlay(cls, *args):
+        raise NotImplementedError
         return cls._concat_impl(False, *args)
