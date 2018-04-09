@@ -54,7 +54,7 @@ class Piece(object):
 
         # Convert the music21 stream, each bar becomes a mud.Span
         measures = s.getElementsByClass('Measure')
-        for i, m in enumerate(measures):
+        for m in measures:
             events = []
             for elem in m.notesAndRests:
                 if elem.isNote:
@@ -67,6 +67,9 @@ class Piece(object):
             self._bars.append(span)
 
         return self
+
+    def as_span(self):
+        return Span.concat(*self._events)
 
     def events(self):
         raise NotImplementedError

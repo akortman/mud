@@ -6,14 +6,15 @@ from event import Event
 from notation import Rest, Note, Pitch, Time
 
 class Span(object):
-    def __init__(self, events, offset=None, length=None, sort=True):
+    def __init__(self, events, offset=0, length=None, sort=True):
         '''
         events must be a list of Events, or a list of (e, t) tuples,
         where e is a the object wrapped by the event (Note, Rest, etc)
         and   t is a mud.Time (the offset from the start of the span)
         '''
         self._events = []
-        assert type(offset) is int or type(offset) is float or type(offset) is Time
+        if type(offset) is not int and type(offset) is not float and type(offset) is not Time:
+            raise ValueError('Cannot construct offset from value of type {}'.format(type(offset)))
         self._offset = Time(offset)
         for e in events:
             if type(e) is Event:
@@ -81,3 +82,33 @@ class Span(object):
 
     def __eq__(self, other):
         raise NotImplementedError
+
+    @classmethod
+    def _concat_impl(cls, add_offset, *args):
+        def concat_two(span_a, span_b, add_offset):
+            if not isinstance(span_a, cls) or not isinstance(span_b, cls):
+                raise ValueError('can only concatenate Spans, saw {}, {}'
+                                 .format(type(span_a), type(span_b)))
+            offset = span_a.length()
+            for event in span_b:
+                t = event.time()
+                if add_offset:
+                    t += offset
+                e = Event(event.unwrap(), time=t)
+                span_a._events.append(e)
+
+            return span_a
+
+        from copy import deepcopy
+        result = deepcopy(args[0])
+        for span in args[1:]:
+            result = concat_two(result, span,add_offset)
+        return result
+    
+    @classmethod
+    def concat(cls, *args):
+        return cls._concat_impl(True, *args)
+
+    @classmethod
+    def overlay(cls, *args):
+        return cls._concat_impl(False, *args)

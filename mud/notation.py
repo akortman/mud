@@ -171,6 +171,11 @@ class Time(object):
         b = other.as_quantized(res)
         return a.in_resolution_steps() == b.in_resolution_steps()
 
+    def __add__(self, other):
+        if not isinstance(other, self.__class__):
+            raise ValueError('can only add mud.Time to another mud.Time')
+        return Time(self._time + other._time)
+
 class Duration(object):
     '''
     A class representing the duration of a musical event.
