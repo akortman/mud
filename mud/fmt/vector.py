@@ -39,9 +39,11 @@ class EventVectorBuilder(VectorBuilder):
     def dim(self):
         return self._vec_len
 
+    def _make_numpy_subvectors(self, event):
+        return [feature.make_subvector(event) for feature in self._features]
+
     def _make_numpy_vector(self, event):
-        vecs = [feature.make_subvector(event) for feature in self._features]
-        return np.concatenate(vecs)
+        return np.concatenate(self._make_numpy_subvectors(event))
 
     def make_vector(self, event):
         if not isinstance(event, Event):

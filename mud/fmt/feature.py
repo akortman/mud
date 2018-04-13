@@ -22,9 +22,22 @@ class IsNote(Feature):
 
     def make_subvector(self, event):
         if event.is_note():
-            return np.zeros(1)
+            return np.ones(1)
         else:
-            return np.zeros(0)
+            return np.zeros(1)
+
+class IsRest(Feature):
+    def __init__(self):
+        pass
+
+    def dim(self):
+        return 1
+
+    def make_subvector(self, event):
+        if event.is_rest():
+            return np.ones(1)
+        else:
+            return np.zeros(1)
 
 class NotePitch(Feature):
     def __init__(self, pitch_labels):
