@@ -63,6 +63,8 @@ class RelativePitchLabels(Labels):
 
     def get_label_of(self, pitch):
         p = Pitch(pitch)
+        if p.octave() is not None:
+            raise ValueError('Pitches provided to RelativePitchLabels must not have octave markers: {}'.format(pitch))
         try:
             return self._values_to_labels[p]
         except KeyError:
