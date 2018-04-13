@@ -18,7 +18,11 @@ def _numpy_to_output_library_format(nparray, output_library):
         try:
             import torch
             return torch.Tensor(nparray)
+<<<<<<< HEAD
         except (ImportError, ModuleNotFoundError):
+=======
+        except ImportError, ModuleNotFoundError:
+>>>>>>> 7817101a3e0e3f7358f8fca2533cd6cee1320bd6
             raise ValueError('Using output library pytorch, which is could not be imported')
     else:
         raise ValueError('Cannot convert output vector to unsupported format {}'.format(output_library))
