@@ -5,6 +5,7 @@ Each class takes an Event and generates a subvector, which are then concatenated
 
 import numpy as np
 from .binary_vector import binvec
+from . import label
 
 class Feature(object):
     def dim(self):
@@ -73,7 +74,7 @@ class NoteRelativePitch(Feature):
         see: mud.fmt.make_pitch_labels
         '''
         if pitch_labels is None:
-            self._pitch_labels
+            self._pitch_labels = label.RelativePitchLabels()
         else:
             self._pitch_labels = pitch_labels
         self._dim = pitch_labels.num_labels
