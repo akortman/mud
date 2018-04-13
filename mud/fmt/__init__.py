@@ -1,4 +1,4 @@
 from vector import EventVectorBuilder
-from label  import make_pitch_labels
+from label  import PitchLabels
 
 import feature

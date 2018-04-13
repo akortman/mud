@@ -34,12 +34,12 @@ class NotePitch(Feature):
         (labels are integers)
         see: mud.fmt.make_pitch_labels
         '''
-        self._labels = pitch_labels
-        self._dim = max([pitch_labels[k] for k in pitch_labels])
+        self._pitch_labels = pitch_labels
+        self._dim = pitch_labels.num_labels
 
-    def dim(self):   
+    def dim(self):
         return self._dim
 
     def make_subvector(self, event):
-        label = self._labels[event.pitch()]
+        label = self._pitch_labels.get_label_of(event.pitch())
         return binvec(self._dim, label)
