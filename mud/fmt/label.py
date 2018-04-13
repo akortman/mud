@@ -1,6 +1,6 @@
 from ..notation import Pitch
 
-_relative_pitches_all = relative_pitch_to_str = [
+_relative_pitches_all = [
     'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'
 ]
 
@@ -22,32 +22,54 @@ class Labels(object):
 
 class PitchLabels(Labels):
     def __init__(self, octave_range, rpitches='all'):
-        self._labels, self._num_labels = _make_pitch_labels(octave_range, rpitches)
-        self._values = {value: key for key, value in self._labels.items()}
-
-    def __setitem__(self, key, item):
-        raise NotImplementedError
-        # It's not clear what this means for num_labels,
-        # so it's disabled for now.
-        self._labels[Pitch(key)] = int(item)
-        self._values[int(item)] = Pitch(key)
+        self._values_to_labels, self._num_labels = _make_pitch_labels(octave_range, rpitches)
+        self._labels_to_values = {value: key for key, value in self._values_to_labels.items()}
 
     @property
     def num_labels(self):
         return self._num_labels
 
-    def __getitem__(self, key):
-        return self._labels[Pitch(key)]
-
     def get_label_of(self, pitch):
         p = Pitch(pitch)
         try:
-            return self._labels[p]
+            return self._values_to_labels[p]
         except KeyError:
             raise ValueError("Pitch {} does not have a valid label", p)
 
     def get_value_of(self, label):
         try:
-            return self._values[int(label)]
+            return self._labels_to_values[int(label)]
+        except KeyError:
+            raise ValueError("Label {} does is not associated with a pitch", int(label))
+
+class RelativePitchLabels(Labels):
+    def __init__(self, rpitches='all'):
+        '''
+        Create a set of relative pitch labels.
+        rpitches should be 'all' or an iterable of allowed pitches (or strings directly convertible to Pitches.)
+
+        '''
+        labels_list = _relative_pitches_all if rpitches == 'all' else rpitches
+        for pitch in labels_list:
+            if Pitch(pitch).octave() is not None:
+                raise ValueError('Pitches provided to RelativePitchLabels must not have octave markers: {}'.format(pitch))
+        self._labels_to_values = {i: Pitch(pitch) for i, pitch in enumerate(labels_list)}
+        self._values_to_labels = {pitch: label for label, pitch in self._labels_to_values.items()}
+        self._num_labels = len(self._labels_to_values.keys())
+
+    @property
+    def num_labels(self):
+        return self._num_labels
+
+    def get_label_of(self, pitch):
+        p = Pitch(pitch)
+        try:
+            return self._values_to_labels[p]
+        except KeyError:
+            raise ValueError("Pitch {} does not have a valid label", p)
+
+    def get_value_of(self, label):
+        try:
+            return self._labels_to_values[int(label)]
         except KeyError:
             raise ValueError("Label {} does is not associated with a pitch", int(label))
