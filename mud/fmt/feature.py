@@ -71,7 +71,6 @@ class NoteRelativePitch(Feature):
         Create a note relative pitch feature.
         'labels' should be a dict that maps pitch strings (without octaves) to labels.
         (labels are integers)
-        see: mud.fmt.make_pitch_labels
         '''
         if pitch_labels is None:
             self._pitch_labels = label.RelativePitchLabels()
