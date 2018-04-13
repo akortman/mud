@@ -45,10 +45,11 @@ class EventVectorBuilder(VectorBuilder):
     def _make_numpy_vector(self, event):
         return np.concatenate(self._make_numpy_subvectors(event))
 
-    def make_vector(self, event):
+    def make_vector(self, event, library=None):
         if not isinstance(event, Event):
             raise ValueError('EventVectorBuilder only formats Events')
-        return _numpy_to_output_library_format(self._make_numpy_vector(event), self._output_library)
+        return _numpy_to_output_library_format(self._make_numpy_vector(event),
+                                               self._output_library if library is None else library)
 
 
 
