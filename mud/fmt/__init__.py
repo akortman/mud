@@ -1,4 +1,4 @@
-from vector import EventVectorBuilder
-from label  import PitchLabels
+from .vector import EventVectorBuilder
+from .label  import PitchLabels
 
-import feature
+from . import feature

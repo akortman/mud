@@ -2,9 +2,9 @@
 A span is a range of musical events, particularly notes and rests.
 '''
 
-from event import Event
-from notation import Rest, Note, Pitch, Time
-from timeslice import TimeSlice
+from .event import Event
+from .notation import Rest, Note, Pitch, Time
+from .timeslice import TimeSlice
 
 class Span(object):
     def __init__(self, events, offset=0, length=None, sort=True):

@@ -4,7 +4,7 @@ Each class takes an Event and generates a subvector, which are then concatenated
 '''
 
 import numpy as np
-from binary_vector import binvec
+from .binary_vector import binvec
 
 class Feature(object):
     def dim(self):

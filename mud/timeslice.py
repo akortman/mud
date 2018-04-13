@@ -2,8 +2,8 @@
 TimeSlice API provides a utility to get the information about all playing notes within a small slice of time.classmethod
 '''
 
-from notation import Time
-from event import Event
+from .notation import Time
+from .event import Event
 
 class SlicedEvent(Event):
     '''

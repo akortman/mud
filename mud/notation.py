@@ -3,7 +3,7 @@ Music notation-related classes.
 '''
 
 import copy
-from settings import settings
+from .settings import settings
 
 class Pitch(object):
     '''

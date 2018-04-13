@@ -2,9 +2,9 @@
 Utilities for building feature vectors from notes.
 '''
 
-import feature
 import numpy as np
 import enum
+from . import feature
 from ..event import Event
 
 class OutputLibrary(enum.Enum):
