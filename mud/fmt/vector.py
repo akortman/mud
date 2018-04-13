@@ -18,8 +18,8 @@ def _numpy_to_output_library_format(nparray, output_library):
         try:
             import torch
             return torch.Tensor(nparray)
-        except ImportError:
-            raise ValueError('Using output library pytorch, which is not installed')
+        except (ImportError, ModuleNotFoundError):
+            raise ValueError('Using output library pytorch, which is could not be imported')
     else:
         raise ValueError('Cannot convert output vector to unsupported format {}'.format(output_library))
 
