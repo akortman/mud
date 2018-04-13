@@ -23,7 +23,7 @@ class Labels(object):
 class PitchLabels(Labels):
     def __init__(self, octave_range, rpitches='all'):
         self._labels, self._num_labels = _make_pitch_labels(octave_range, rpitches)
-        self._values = {value: key for key, value in self._labels.iteritems()}
+        self._values = {value: key for key, value in self._labels.items()}
 
     def __setitem__(self, key, item):
         raise NotImplementedError

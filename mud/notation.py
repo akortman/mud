@@ -74,6 +74,9 @@ class Pitch(object):
         return (self._relative_pitch == other._relative_pitch
                 and self._octave == other._octave)
 
+    def __hash__(self):
+        return hash((self._relative_pitch, self._octave))
+
     @classmethod
     def to_midi_pitch(cls, relative_pitch, octave):
         '''
