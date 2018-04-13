@@ -40,7 +40,14 @@ class PitchLabels(Labels):
         return self._labels[Pitch(key)]
 
     def get_label_of(self, pitch):
-        return self._labels[Pitch(pitch)]
+        p = Pitch(pitch)
+        try:
+            return self._labels[p]
+        except KeyError:
+            raise ValueError("Pitch {} does not have a valid label", p)
 
     def get_value_of(self, label):
-        return self._values[int(label)]
+        try:
+            return self._values[int(label)]
+        except KeyError:
+            raise ValueError("Label {} does is not associated with a pitch", int(label))

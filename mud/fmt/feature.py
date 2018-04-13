@@ -22,9 +22,9 @@ class IsNote(Feature):
 
     def make_subvector(self, event):
         if event.is_note():
-            np.zeros(1)
+            return np.zeros(1)
         else:
-            np.zeros(0)
+            return np.zeros(0)
 
 class NotePitch(Feature):
     def __init__(self, pitch_labels):
@@ -41,5 +41,8 @@ class NotePitch(Feature):
         return self._dim
 
     def make_subvector(self, event):
-        label = self._pitch_labels.get_label_of(event.pitch())
+        p = event.pitch()
+        if p is None:
+            return np.zeros(self._dim)
+        label = self._pitch_labels.get_label_of(p)
         return binvec(self._dim, label)

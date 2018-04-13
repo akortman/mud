@@ -37,7 +37,6 @@ class Pitch(object):
                 raise ValueError('If Pitch is made as a copy, it can\'t have an octave argument.')
             self._relative_pitch = pitch._relative_pitch
             self._octave = pitch._octave
-
         elif type(pitch) is str:
             (self._relative_pitch, self._octave) = Pitch.pitch_string_to_pitch_octave_pair(pitch)
             # If the parsed string has an octave value AND we were given an octave value, raise an error.
@@ -48,6 +47,8 @@ class Pitch(object):
             if pitch < 0 or pitch > 11: raise ValueError('pitch must be between 0 and 11 (inclusive), use octave argument to give octave info')
             self._relative_pitch = pitch
             self._octave = octave
+        else:
+            raise ValueError('invalid initialization of Pitch, args are: (pitch={}, octave={})'.format(pitch, octave))
 
     def octave(self):
         return self._octave
@@ -60,6 +61,7 @@ class Pitch(object):
         return self._relative_pitch
 
     def name(self):
+
         if self._octave is None:
             return self.__class__.relative_pitch_to_str[self._relative_pitch]
         return '{}{}'.format(self.__class__.relative_pitch_to_str[self._relative_pitch], self._octave)
