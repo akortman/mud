@@ -14,7 +14,10 @@ class Feature(object):
     def make_subvector(self, event):
         raise NotImplementedError
 
-class IsNote(Feature):
+class EventFeature(Feature):
+    pass
+
+class IsNote(EventFeature):
     def __init__(self):
         pass
 
@@ -27,7 +30,7 @@ class IsNote(Feature):
         else:
             return np.zeros(1)
 
-class IsRest(Feature):
+class IsRest(EventFeature):
     def __init__(self):
         pass
 
@@ -40,7 +43,7 @@ class IsRest(Feature):
         else:
             return np.zeros(1)
 
-class NotePitch(Feature):
+class NotePitch(EventFeature):
     def __init__(self, pitch_labels):
         '''
         Create a note pitch feature.
@@ -61,7 +64,7 @@ class NotePitch(Feature):
         label = self._pitch_labels.get_label_of(p)
         return binvec(self._dim, label)
 
-class NoteRelativePitch(Feature):
+class NoteRelativePitch(EventFeature):
     '''
     Generates feature vectors from an Event.
     Generates a _relative pitch_ vector, i.e. pitch without octave.
@@ -93,7 +96,7 @@ class NoteRelativePitch(Feature):
         label = self._pitch_labels.get_label_of(rp)
         return binvec(self._dim, label)
 
-class NoteOctave(Feature):
+class NoteOctave(EventFeature):
     '''
     Generates feature vectors marking the labelled octave of a note.
     '''
@@ -115,7 +118,7 @@ class NoteOctave(Feature):
         label = self._label_of_octave(p.octave())
         return binvec(self.dim(), (label,))
 
-class NoteOctaveContinuous(Feature):
+class NoteOctaveContinuous(EventFeature):
     '''
     Generates feature vectors marking the continuous octave of a note.
     This means that rather than a one-hot vector with a 1 marking the octave,
