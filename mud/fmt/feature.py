@@ -92,3 +92,38 @@ class NoteRelativePitch(Feature):
             return np.zeros(self._dim)
         label = self._pitch_labels.get_label_of(rp)
         return binvec(self._dim, label)
+
+class NoteOctave(Feature):
+    '''
+    Generates feature vectors marking the labelled octave of a note.
+    '''
+    def __init__(self, octave_range):
+        if len(octave_range) != 2 or octave_range[0] > octave_range[1]:
+            raise ValueError
+        self._octave_range = octave_range
+
+    def dim(self):
+        return 1 + self._octave_range[1] - self._octave_range[0]
+
+    def _label_of_octave(self, octave):
+        return octave - self._octave_range[0]
+
+    def make_subvector(self, event):
+        label = self._label_of_octave(event.pitch().octave())
+        return binvec(self.dim(), (label,))
+
+class NoteOctaveContinuous(Feature):
+    '''
+    Generates feature vectors marking the continuous octave of a note.
+    This means that rather than a one-hot vector with a 1 marking the octave,
+    it's a continuous 1, 2, 3, 4... with dimension 1.
+    '''
+    def __init__(self):
+        pass
+
+    def dim(self):
+        return 1
+
+    def make_subvector(self, event):
+        octave = event.pitch().octave()
+        return np.full((1,), float(octave), dtype='float')
