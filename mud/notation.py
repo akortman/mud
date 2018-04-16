@@ -66,6 +66,12 @@ class Pitch(object):
     def relative_pitch(self):
         return self._relative_pitch
 
+    def name_relative(self):
+        raise NotImplementedError
+
+    def strip_octave(self):
+        return self.__class__(pitch=self._relative_pitch, octave=None)
+
     def name(self):
         if self._octave is None:
             return self.__class__.relative_pitch_to_str[self._relative_pitch]

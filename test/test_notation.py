@@ -38,6 +38,10 @@ class TestPitch(unittest.TestCase):
         self.assertEqual(p, mud.Pitch('G#6'))
         self.assertEqual(p, mud.Pitch('Ab6'))
 
+    def test_strip_octave(self):
+        self.assertEqual(mud.Pitch('D4').strip_octave(), mud.Pitch('D'))
+        self.assertEqual(mud.Pitch('C#', 3).strip_octave(), mud.Pitch('C#'))
+
     def test_from_music21(self):
         pitch_strs = {'G#4', 'C7'}
         for pstr in pitch_strs:
