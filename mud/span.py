@@ -69,7 +69,9 @@ class Span(object):
         self._offset = Time(0.0)
 
     def sort(self):
-        self._events.sort(key=lambda e: e.time().in_beats())
+        self._events.sort(key=lambda e: (e.time().in_resolution_steps(),
+                                         e.pitch().midi_pitch(assumed_octave=4)
+                                            if (e.pitch() is not None) else None))
 
     def get_slice(self, slice_range):
         return TimeSlice(self, slice_range)
@@ -121,7 +123,8 @@ class Span(object):
         result.move_offset_to_events()
         for span in args[1:]:
             result = cls._overlay_two_spans(result, span)
-        assert abs(result.offset()) < 0.000001
+        assert result.offset() == Time(0)
+        result.sort()
         return result
 
     @classmethod

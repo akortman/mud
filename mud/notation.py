@@ -53,15 +53,20 @@ class Pitch(object):
     def octave(self):
         return self._octave
 
-    def midi_pitch(self):
-        if self._octave is None: raise ValueError('Pitches without an octave don\'t have a midi absolute pitch')
-        return Pitch.to_midi_pitch(self._relative_pitch, self._octave)
+    def midi_pitch(self, assumed_octave=None):
+        '''
+        Convert to an integer midi pitch.
+        If `assumed_octave` is provided, notes without octave information will be assumed to be in this octave,
+        otherwise ValueError will be thrown. This option is provided mainly for sorting purposes.
+        '''
+        if self._octave is None and assumed_octave is None:
+            raise ValueError('Pitches without an octave don\'t have a midi absolute pitch')
+        return Pitch.to_midi_pitch(self._relative_pitch, self._octave if (self._octave is not None) else assumed_octave)
 
     def relative_pitch(self):
         return self._relative_pitch
 
     def name(self):
-
         if self._octave is None:
             return self.__class__.relative_pitch_to_str[self._relative_pitch]
         return '{}{}'.format(self.__class__.relative_pitch_to_str[self._relative_pitch], self._octave)
@@ -78,6 +83,13 @@ class Pitch(object):
 
     def __hash__(self):
         return hash((self._relative_pitch, self._octave))
+
+    @classmethod
+    def compare(cls, a, b):
+        '''
+        returns negative if a is lower than b, 0 if they are the same, and positive if a is higher than b.
+        '''
+        return a._relative_pitch + 12*a._octave - b._relative_pitch + 12*b._octave
 
     @classmethod
     def to_midi_pitch(cls, relative_pitch, octave):
