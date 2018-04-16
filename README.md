@@ -19,31 +19,32 @@ directory (with setup.py in it). Then `import mud` and continue.
 
 ## Features
 ### Data formatting
-Time quantization and time slicing API for finding all events occuring in 
+Time quantization and time slicing API for finding all events occuring within a particular
+time range.
 ```python3
 piece = mud.Piece('path/to/piece.musicxml')
 # Pieces are represented as a number of Spans.
 # Spans are generic subsections of a piece of music.
 # However, mud.Piece is stored by default with Spans containing each measure of the piece.
-# (you can retrieve a single Span using Piece(...).as_span(), or iterate over events using
-# `for event in piece.events()`)
+# You can retrieve the entire piece as a single Span using `Piece(...).as_span()`, or
+# iterate over events using `for event in piece.events()`.
 
-# If we want to take a look at this, we can:
+# If we want to take a look at this, we can do:
 piece.pprint()
-# Piece: path/to/piece.musicxml
-#     {Bar 0} (Time[0.0, resolution=0.0] to Time[4.0, resolution=32.0]):
-#         {Event 0.0} Note [ 'C4', 1.0 ]
-#         {Event 0.0} Note [ 'G5', 1.0 ]
-#         {Event 1.0} Rest [ 1.0 ]
-#         {Event 2.0} Note [ 'C4', 2.0 ]
-#         {Event 2.0} Note [ 'A4', 2.0 ]
+#   Piece: path/to/piece.musicxml
+#       {Bar 0} (Time[0.0, resolution=0.0] to Time[4.0, resolution=32.0]):
+#           {Event 0.0} Note [ 'C4', 1.0 ]
+#           {Event 0.0} Note [ 'G5', 1.0 ]
+#           {Event 1.0} Rest [ 1.0 ]
+#           {Event 2.0} Note [ 'C4', 2.0 ]
+#           {Event 2.0} Note [ 'A4', 2.0 ]
 
 # Now, to see all events occuring within time 2.5 to 3.0 (in beats/quarter notes):
-ts = p.as_span().get_slice((1.5, 2.0))
+ts = p.as_span().get_slice((2.5, 3.0))
 from pprint import pprint
 pprint(ts.raw_events())
-# [Event[Note [ 'C4', 2.0 ], time=Time[2.0, resolution=16.0]],
-#  Event[Note [ 'A4', 2.0 ], time=Time[2.0, resolution=16.0]]]
+#   [Event[Note [ 'C4', 2.0 ], time=Time[2.0, resolution=16.0]],
+#    Event[Note [ 'A4', 2.0 ], time=Time[2.0, resolution=16.0]]]
 
 # If we want to iterate through sliced versions of the events, we can use ts.sliced_events(),
 # which will also mark whether the event extends before or beyond the slice:
@@ -51,7 +52,8 @@ TODO
 
 # It's also useful to check whether any of the contained events are smaller than the slice.
 # This is referred to as an 'atomic slice' by `mud`.
-if not ts.is_atomic_slice(): raise 'this won't be raised!'
+if not ts.is_atomic_slice():
+    raise 'this won't be raised!'
 ```
 
 Extensible input/label generation for musical events (currently notes and rests):
@@ -80,3 +82,6 @@ labels = formatter.make_labels(mud.Note('G#4'))
 # G#4 is the 7th pitch in our labels.
 # If necessary, further features and labels can be added: durations, note velocity, etc.
 ```
+
+The idea is to use the time slicing API to subdivide your pieces, then a EventDataBuilder to convert those
+into formats ready to use with deep learning models.
