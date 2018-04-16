@@ -22,8 +22,12 @@ class Labels(object):
         raise NotImplementedError
 
 class PitchLabels(Labels):
-    def __init__(self, octave_range, rpitches='all'):
+    def __init__(self, octave_range, include_rest=False, rpitches='all'):
+        self._include_rest = include_rest
         self._values_to_labels, self._num_labels = _make_pitch_labels(octave_range, rpitches)
+        if include_rest:
+            self._values_to_labels[None] = self._num_labels
+            self._num_labels += 1
         self._labels_to_values = {value: key for key, value in self._values_to_labels.items()}
 
     @property
@@ -34,7 +38,9 @@ class PitchLabels(Labels):
         return self.get_label_of(event.pitch())
 
     def get_label_of(self, pitch):
-        p = Pitch(pitch)
+        if pitch is None and not self._include_rest:
+            return None
+        p = Pitch(pitch) if pitch is not None else None
         try:
             return self._values_to_labels[p]
         except KeyError:
