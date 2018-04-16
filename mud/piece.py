@@ -69,13 +69,11 @@ class Piece(object):
         return self
 
     def as_span(self):
-        return Span.concat(*self._bars)
+        return Span.overlay(*self._bars)
 
     def events(self):
-        raise NotImplementedError
-        for bar in self._bars:
-            for event in bar:
-                yield event
+        s = self.as_span()
+        return s.__iter__()
 
     def count_events(self):
         return sum(b.num_events() for b in self._bars)

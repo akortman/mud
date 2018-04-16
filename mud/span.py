@@ -63,6 +63,11 @@ class Span(object):
     def offset(self):
         return self._offset
 
+    def move_offset_to_events(self):
+        for i, _ in enumerate(self._events):
+            self._events[i]._time += self._offset
+        self._offset = Time(0.0)
+
     def sort(self):
         self._events.sort(key=lambda e: e.time().in_beats())
 
@@ -94,32 +99,34 @@ class Span(object):
         raise NotImplementedError
 
     @classmethod
-    def _concat_impl(cls, add_offset, *args):
-        def concat_two(span_a, span_b, add_offset):
-            if not isinstance(span_a, cls) or not isinstance(span_b, cls):
-                raise ValueError('can only concatenate Spans, saw {}, {}'
-                                 .format(type(span_a), type(span_b)))
-            offset = span_a.length()
-            for event in span_b:
-                t = event.time()
-                if add_offset:
-                    t += offset
-                e = Event(event.unwrap(), time=t)
-                span_a._events.append(e)
+    def _overlay_two_spans(cls, span_a, span_b):
+        if not isinstance(span_a, cls) or not isinstance(span_b, cls):
+            raise ValueError('can only overlay Spans, saw types {}, {}'
+                                .format(type(span_a), type(span_b)))
+        
+        for event in span_b:
+            t = event.time() + span_b.offset()
+            e = Event(event.unwrap(), time=t)
+            span_a._events.append(e)
 
-            return span_a
-
-        from copy import deepcopy
-        result = deepcopy(args[0])
-        for span in args[1:]:
-            result = concat_two(result, span,add_offset)
-        return result
-    
-    @classmethod
-    def concat(cls, *args):
-        return cls._concat_impl(True, *args)
+        return span_a
 
     @classmethod
     def overlay(cls, *args):
+        '''
+        Overlay two spans on top of each other, removing offsets in the process.
+        '''
+        from copy import deepcopy
+        result = deepcopy(args[0])
+        result.move_offset_to_events()
+        for span in args[1:]:
+            result = cls._overlay_two_spans(result, span)
+        assert abs(result.offset()) < 0.000001
+        return result
+
+    @classmethod
+    def concat(cls, *args):
+        '''
+        Concatentate two spans together.
+        '''
         raise NotImplementedError
-        return cls._concat_impl(False, *args)
