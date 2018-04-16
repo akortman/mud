@@ -109,7 +109,10 @@ class NoteOctave(Feature):
         return octave - self._octave_range[0]
 
     def make_subvector(self, event):
-        label = self._label_of_octave(event.pitch().octave())
+        p = event.pitch()
+        if p is None:
+            return np.zeros(self.dim())
+        label = self._label_of_octave(p.octave())
         return binvec(self.dim(), (label,))
 
 class NoteOctaveContinuous(Feature):
@@ -118,12 +121,17 @@ class NoteOctaveContinuous(Feature):
     This means that rather than a one-hot vector with a 1 marking the octave,
     it's a continuous 1, 2, 3, 4... with dimension 1.
     '''
-    def __init__(self):
-        pass
+    def __init__(self, rest_octave_value=0.0):
+        self._rest_octave_value = rest_octave_value
 
     def dim(self):
         return 1
 
     def make_subvector(self, event):
-        octave = event.pitch().octave()
+        try:
+            octave = event.pitch().octave()
+        except AttributeError:
+            if (self._rest_octave_value is None):
+                return None
+            octave = self._rest_octave_value
         return np.full((1,), float(octave), dtype='float')

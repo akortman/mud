@@ -60,10 +60,7 @@ class RelativePitchLabels(Labels):
 
         '''
         labels_list = _relative_pitches_all if rpitches == 'all' else rpitches
-        for pitch in labels_list:
-            if Pitch(pitch).octave() is not None:
-                raise ValueError('Pitches provided to RelativePitchLabels must not have octave markers: {}'.format(pitch))
-        self._labels_to_values = {i: Pitch(pitch) for i, pitch in enumerate(labels_list)}
+        self._labels_to_values = {i: Pitch(pitch).strip_octave() for i, pitch in enumerate(labels_list)}
         self._values_to_labels = {pitch: label for label, pitch in self._labels_to_values.items()}
         self._num_labels = len(self._labels_to_values.keys())
 
@@ -75,13 +72,11 @@ class RelativePitchLabels(Labels):
         return self.get_label_of(event.pitch())
 
     def get_label_of(self, pitch):
-        p = Pitch(pitch)
-        if p.octave() is not None:
-            raise ValueError('Pitches provided to RelativePitchLabels must not have octave markers: {}'.format(pitch))
+        p = Pitch(pitch).strip_octave()
         try:
             return self._values_to_labels[p]
         except KeyError:
-            raise ValueError("Pitch {} does not have a valid label", p)
+            raise ValueError("Pitch {} does not have a label", p)
 
     def get_value_of(self, label):
         try:
