@@ -9,10 +9,10 @@ from . import label
 
 class Feature(object):
     def dim(self):
-        return 0
+        raise NotImplementedError
 
     def make_subvector(self, event):
-        return np.zeros(0)
+        raise NotImplementedError
 
 class IsNote(Feature):
     def __init__(self):

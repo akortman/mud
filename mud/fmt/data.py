@@ -23,18 +23,22 @@ def _numpy_to_output_library_format(nparray, output_library):
     else:
         raise ValueError('Cannot convert output vector to unsupported format {}'.format(output_library))
 
-class VectorBuilder(object):
-    def make_vector(self, obj):
-        pass
+class DataBuilder(object):
+    def make_vector(self, obj, library=None):
+        raise NotImplementedError
+        
+    def make_labels(self, obj, library=None):
+        raise NotImplementedError
 
-class EventVectorBuilder(VectorBuilder):
+class EventDataBuilder(DataBuilder):
     '''
-    Class that builds vectors from Events.
+    Class that builds vectors and labels from Events.
     '''
-    def __init__(self, features, library=OutputLibrary.NUMPY):
+    def __init__(self, features, labels, default_library=OutputLibrary.NUMPY):
         self._features = features
+        self._labels = labels
         self._vec_len = sum(f.dim() for f in features)
-        self._output_library = library
+        self._output_library = default_library
 
     def dim(self):
         return self._vec_len
@@ -45,11 +49,19 @@ class EventVectorBuilder(VectorBuilder):
     def _make_numpy_vector(self, event):
         return np.concatenate(self._make_numpy_subvectors(event))
 
-    def make_vector(self, event, library=None):
+    def _assert_is_event(self, event):
         if not isinstance(event, Event):
             raise ValueError('EventVectorBuilder only formats Events')
+
+    def make_vector(self, event, library=None):
+        self._assert_is_event(event)
         return _numpy_to_output_library_format(self._make_numpy_vector(event),
                                                self._output_library if library is None else library)
+
+    def make_labels(self, event, library=None):
+        self._assert_is_event(event)
+        return tuple(l.get_event_label(event) for l in self._labels)
+
 
 
 

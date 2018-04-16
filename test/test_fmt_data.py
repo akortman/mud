@@ -1,16 +1,22 @@
 import unittest
 import mud
 import mud.fmt.feature as feature
+import mud.fmt.label as label
 
-class TestFmtEventVectorBuilder(unittest.TestCase):
+class TestFmtData(unittest.TestCase):
     def test(self):
-        pitch_labels = mud.fmt.PitchLabels(octave_range=(4, 6))
-        formatter = mud.fmt.EventVectorBuilder((
-            feature.IsNote(),
-            feature.IsRest(),
-            feature.NotePitch(pitch_labels),
-        ))
+        pitch_labels = label.PitchLabels(octave_range=(4, 6))
+        formatter = mud.fmt.EventDataBuilder(
+            features=(
+                feature.IsNote(),
+                feature.IsRest(),
+                feature.NotePitch(pitch_labels),
+            ),
+            labels=(
+                pitch_labels
+            ))
 
+        # TEST INPUT VECTOR CONSTRUCTION
         event = mud.Event(mud.Note('C#4', mud.Time(1.0)), mud.Time(0.0))
         v = formatter.make_vector(event)
         self.assertEqual(v.shape, (12 * 3 + 2,)) # 3 octaves + 1 note indicator + 1 rest indicator

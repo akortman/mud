@@ -18,7 +18,8 @@ def _make_pitch_labels(octave_range, rpitches='all'):
     return labels, next_label
 
 class Labels(object):
-    pass
+    def get_event_label(self, event):
+        raise NotImplementedError
 
 class PitchLabels(Labels):
     def __init__(self, octave_range, rpitches='all'):
@@ -28,6 +29,9 @@ class PitchLabels(Labels):
     @property
     def num_labels(self):
         return self._num_labels
+
+    def get_event_label(self, event):
+        return self.get_label_of(event.pitch())
 
     def get_label_of(self, pitch):
         p = Pitch(pitch)
@@ -60,6 +64,9 @@ class RelativePitchLabels(Labels):
     @property
     def num_labels(self):
         return self._num_labels
+
+    def get_event_label(self, event):
+        return self.get_label_of(event.pitch())
 
     def get_label_of(self, pitch):
         p = Pitch(pitch)
