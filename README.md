@@ -21,7 +21,7 @@ directory (with setup.py in it). Then `import mud` and continue.
 ### Data formatting
 Time quantization and time slicing API for finding all events occuring within a particular
 time range.
-```python3
+```python
 piece = mud.Piece('path/to/piece.musicxml')
 # Pieces are represented as a number of Spans.
 # Spans are generic subsections of a piece of music.
@@ -57,7 +57,7 @@ if not ts.is_atomic_slice():
 ```
 
 Extensible input/label generation for musical events (currently notes and rests):
-```python3
+```python
 import mud
 import mud.fmt.label as label
 import mud.fmt.feature as feature
