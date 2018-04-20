@@ -82,6 +82,13 @@ class Span(object):
             yield self.get_slice((t, t + slice_resolution))
             t += slice_resolution
 
+    def pprint(self):
+        print('Span:')
+        print('    offset = {}'.format(self._offset))
+        print('    length = {}'.format(self.length()))
+        for _, event in enumerate(self._events):
+            print('        {{Event {}}} {}'.format(event.time().in_beats(), event.unwrap()))
+
     def __getitem__(self, key):
         return self._events[key]
 
