@@ -18,6 +18,9 @@ def _make_pitch_labels(octave_range, rpitches='all'):
     return labels, next_label
 
 class Labels(object):
+    @property
+    def num_labels(self):
+        raise NotImplementedError
     def get_event_label(self, event):
         raise NotImplementedError
 
@@ -83,3 +86,35 @@ class RelativePitchLabels(Labels):
             return self._labels_to_values[int(label)]
         except KeyError:
             raise ValueError("Label {} does is not associated with a pitch", int(label))
+
+class ContinuingPreviousEventLabel(Labels):
+    def __init__(self):
+        pass
+        
+    @property
+    def num_labels(self):
+        return 2
+
+    def get_event_label(self, event):
+        try:
+            if not event.is_note_start():
+                return 1
+        except AttributeError:
+            pass
+        return 0
+
+class ContinuesNextEventLabel(Labels):
+    def __init__(self):
+        pass
+        
+    @property
+    def num_labels(self):
+        return 2
+        
+    def get_event_label(self, event):
+        try:
+            if not event.is_note_end():
+                return 1
+        except AttributeError:
+            pass
+        return 0
