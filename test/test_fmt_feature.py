@@ -91,3 +91,59 @@ class TestNoteOctaveContinuous(unittest.TestCase):
         self.assertEqual(v.shape, (1,))
         self.assertAlmostEqual(v, 0.0)
 
+class TestContinuingPreviousEvent(unittest.TestCase):
+    def test(self):
+        f = feature.ContinuingPreviousEvent()
+        self.assertEqual(f.dim(), 1)
+        
+        event = mud.Event(mud.Note('C#4', mud.Time(4.0)), mud.Time(0.0))
+        v = f.make_subvector(event)
+        self.assertEqual(v.shape, (1,))
+        self.assertAlmostEqual(v[0], 0.0)
+
+        # middle slice
+        sliced_event = mud.SlicedEvent((2.0, 3.0), event)
+        v = f.make_subvector(sliced_event)
+        self.assertEqual(v.shape, (1,))
+        self.assertAlmostEqual(v[0], 1.0)
+
+        # no slice
+        sliced_event = mud.SlicedEvent((0.0, 4.0), event)
+        v = f.make_subvector(sliced_event)
+        self.assertEqual(v.shape, (1,))
+        self.assertAlmostEqual(v[0], 0.0)
+
+        # slice to end
+        sliced_event = mud.SlicedEvent((2.0, 4.0), event)
+        v = f.make_subvector(sliced_event)
+        self.assertEqual(v.shape, (1,))
+        self.assertAlmostEqual(v[0], 1.0)
+
+class TestContinuesNextEvent(unittest.TestCase):
+    def test(self):
+        f = feature.ContinuesNextEvent()
+        self.assertEqual(f.dim(), 1)
+        
+        event = mud.Event(mud.Note('A6', mud.Time(4.0)), mud.Time(0.0))
+        v = f.make_subvector(event)
+        self.assertEqual(v.shape, (1,))
+        self.assertAlmostEqual(v[0], 0.0)
+
+        # middle slice
+        sliced_event = mud.SlicedEvent((2.0, 3.0), event)
+        v = f.make_subvector(sliced_event)
+        self.assertEqual(v.shape, (1,))
+        self.assertAlmostEqual(v[0], 1.0)
+
+        # no slice
+        sliced_event = mud.SlicedEvent((0.0, 4.0), event)
+        v = f.make_subvector(sliced_event)
+        self.assertEqual(v.shape, (1,))
+        self.assertAlmostEqual(v[0], 0.0)
+
+        # slice from start
+        sliced_event = mud.SlicedEvent((0.0, 3.5), event)
+        v = f.make_subvector(sliced_event)
+        self.assertEqual(v.shape, (1,))
+        self.assertAlmostEqual(v[0], 1.0)
+

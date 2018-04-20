@@ -138,3 +138,41 @@ class NoteOctaveContinuous(EventFeature):
                 return None
             octave = self._rest_octave_value
         return np.full((1,), float(octave), dtype='float')
+
+class ContinuingPreviousEvent(EventFeature):
+    '''
+    Generates feature vectors marking whether this event is a continuation
+    of a previous event.
+    '''
+    def __init__(self):
+        pass
+
+    def dim(self):
+        return 1
+
+    def make_subvector(self, event):
+        try:
+            if not event.is_note_start():
+                return np.ones(1)
+        except AttributeError:
+            pass
+        return np.zeros(1)
+
+class ContinuesNextEvent(EventFeature):
+    '''
+    Generates feature vectors marking whether this event is continued by a
+    subsequent event.
+    '''
+    def __init__(self):
+        pass
+
+    def dim(self):
+        return 1
+
+    def make_subvector(self, event):
+        try:
+            if not event.is_note_end():
+                return np.ones(1)
+        except AttributeError:
+            pass
+        return np.zeros(1)
