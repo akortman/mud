@@ -39,20 +39,29 @@ mud.Piece[
 Piece: test/test-files/piece.musicxml
     {Bar 0} (Time[0.0, resolution=0.0] to Time[4.0, resolution=32.0]):
         {Event 0.0} Note [ 'Db4', 4.0 ]
->>> formatter = mud.fmt.EventDataBuilder(features=(feature.IsNote(), feature.NoteRelativePitch()),
-...                                      labels=(label.IsNote(), label.RelativePitchLabels()))
+>>> formatter = mud.fmt.EventDataBuilder(features=(feature.IsNote(), feature.ContinuesNextEvent(), feature.NoteRelativePitch()),
+...                                      labels=(label.IsNote(), label.RelativePitchLabels(),  label.ContinuesNextEventLabel()))
 >>> data = corpus.format_data(formatter, slice_resolution=resolution)
 >>> from pprint import pprint
 >>> pprint([[[[(event.vec, event.labels) for event in ts.events] for ts in bar.timeslices]
 ...         for bar in piece.bars] for piece in data.data], indent=2)
-[ [ [ [(array([1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1))],
-      [(array([1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1))],
-      [(array([1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1))],
-      [(array([1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1))],
-      [(array([1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1))],
-      [(array([1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1))],
-      [(array([1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1))],
-      [(array([1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1))]]]]
+[ [ [ [(array([1., 1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1, 1))],
+      [(array([1., 1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1, 1))],
+      [(array([1., 1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1, 1))],
+      [(array([1., 1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1, 1))],
+      [(array([1., 1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1, 1))],
+      [(array([1., 1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1, 1))],
+      [(array([1., 1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1, 1))],
+      [(array([1., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1, 0))]]]]
+>>> #          ^   ^   ^   ^             etc...                    ^      ^  ^  ^
+... #   IsNote |   |   |   |                                       |      |  |  |
+... #     flag /   |   |   |                           Is a B (no) /      |  |  |
+... #              |   |   |                                              |  |  | Continues next event label
+... #   Continues  |   |   |                 Is a note (0: rest, 1: note) /  |  \ (0: this is the end note,
+... #   next event /   |   |                                                 |     1: this note is continued
+... #   flag           |   |      Note pitch label (0: C, 1: C#, 2: D, etc ) /        in the next slice)
+... #                  /   \
+... #        is a C (no)   is a C#/Db (yes)
 ```
 The final result is a nested container of pieces, each containing bars, each containing time slices (0.5 beats long),
 each containing simultaneous events.
