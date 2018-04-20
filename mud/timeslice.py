@@ -5,6 +5,8 @@ TimeSlice API provides a utility to get the information about all playing notes 
 from .notation import Time
 from .event import Event
 
+from pprint import pprint
+
 class SlicedEvent(Event):
     '''
     A sliced event is equivalent to an Event, but may have pre- or
@@ -22,11 +24,10 @@ class SlicedEvent(Event):
         self._pre_continue = (self.time().in_beats() < slice_start)
         self._post_continue = (self.time().in_beats() + event_length > slice_end)
         
-        if self._post_continue:
+        if self._post_continue: 
             self.unwrap().set_duration(Time(slice_end - slice_start))
         if self._pre_continue:
             self._time = Time(slice_start)
-        assert abs(self.unwrap().duration().in_beats() - (slice_end - slice_start)) < 0.00001
 
     def is_note_start(self):
         return not self._pre_continue
