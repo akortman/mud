@@ -63,5 +63,7 @@ class DataCorpus(AbstractCorpus):
     def size(self):
         return len(self._data)
 
+    @property
     def data(self):
-        return self._data.__iter__()
+        return self._data
+

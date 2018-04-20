@@ -81,7 +81,7 @@ class NoteRelativePitch(EventFeature):
             self._pitch_labels = pitch_labels
         if not isinstance(self._pitch_labels, label.RelativePitchLabels):
             raise ValueError("pitch labels in NoteRelativePitch must be mud.fmt.label.RelativePitchLabels")
-        self._dim = pitch_labels.num_labels
+        self._dim = self._pitch_labels.num_labels
         if self._dim > 12:
             raise ValueError('Feature vector dimension for relative pitch must be 12 or less')
 

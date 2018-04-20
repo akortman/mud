@@ -3,7 +3,7 @@ import mud
 import os
 
 class TestCorpus(unittest.TestCase):
-    def test_basic(self):
+    def test(self):
         corpus = mud.Corpus(patterns=('test/test-files/canon_in_d.mxl',
                                       'test/test-files/piece.musicxml'))
         self.assertEqual(corpus.size(), 2)
@@ -38,4 +38,20 @@ class TestCorpus(unittest.TestCase):
         os.remove(new_corpus_path)
 
 class TestDataCorpus(unittest.TestCase):
-    pass
+    def test(self):
+        from mud.fmt import label, feature
+        files = ('test/test-files/canon_in_d.mxl',
+                 'test/test-files/piece.musicxml')
+        corpus = mud.Corpus(patterns=files)
+        formatter = mud.fmt.EventDataBuilder(
+            features=(feature.IsNote(),
+                      feature.IsRest(),
+                      feature.NoteRelativePitch()),
+            labels  =(label.IsNote(),
+                      label.RelativePitchLabels()))
+        resolution = 1.0 / 4.0
+        data_corpus = corpus.format_data(formatter, resolution)
+        
+        # First piece
+        self.assertEqual(len(data_corpus.data[0].bars), 27)
+        self.assertEqual(len(data_corpus.data[1].bars), 1)
