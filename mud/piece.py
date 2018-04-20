@@ -68,6 +68,10 @@ class Piece(object):
 
         return self
 
+    def build_from_spans(self, *spans):
+        self.init_empty()
+        self._bars.extend(spans)
+
     def as_span(self):
         return Span.overlay(*self._bars)
 
