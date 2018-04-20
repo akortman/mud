@@ -24,23 +24,27 @@ and convert it to labels and feature vectors at an 0.5 beat/quarter note resolut
 >>> import mud
 >>> from mud.fmt import feature, label
 >>> resolution = 0.5 # The piece will be sliced into segments 0.5 beats/quarter notes in length
->>> corpus = mud.Corpus(('test/test-files/canon_in_d.mxl', 'test/test-files/piece.musicxml'), filters=(mud.piece_filter.AtomicSlicable(resolution),))
+>>> corpus = mud.Corpus(('test/test-files/canon_in_d.mxl', 'test/test-files/piece.musicxml'),
+...                     filters=(mud.piece_filter.AtomicSlicable(resolution),))
 >>> corpus.size() # The filter has removed canon_in_d, as it isn't slicable at a resolution of 0.5
 1
 >>> corpus.pieces[0] # We can look at the piece state
 mud.Piece[
     tonic: None,
     mode: None,
-    [0] Span[length=4.0, offset=Time[0.0, resolution=0.0], (Event[Note [ 'Db4', 4.0 ], time=Time[0.0, resolution=0.0]])],
+    [0] Span[length=4.0, offset=Time[0.0, resolution=0.0],
+             (Event[Note [ 'Db4', 4.0 ], time=Time[0.0, resolution=0.0]])],
 ]
 >>> corpus.pieces[0].pprint() # Or, we can print a nicer, indented view of the piece.
 Piece: test/test-files/piece.musicxml
     {Bar 0} (Time[0.0, resolution=0.0] to Time[4.0, resolution=32.0]):
         {Event 0.0} Note [ 'Db4', 4.0 ]
->>> formatter = mud.fmt.EventDataBuilder(features=(feature.IsNote(), feature.NoteRelativePitch()), labels=(label.IsNote(), label.RelativePitchLabels()))
+>>> formatter = mud.fmt.EventDataBuilder(features=(feature.IsNote(), feature.NoteRelativePitch()),
+...                                      labels=(label.IsNote(), label.RelativePitchLabels()))
 >>> data = corpus.format_data(formatter, slice_resolution=resolution)
 >>> from pprint import pprint
->>> pprint([[[[(event.vec, event.labels) for event in ts.events] for ts in bar.timeslices] for bar in piece.bars] for piece in data.data], indent=2)
+>>> pprint([[[[(event.vec, event.labels) for event in ts.events] for ts in bar.timeslices]
+...         for bar in piece.bars] for piece in data.data], indent=2)
 [ [ [ [(array([1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1))],
       [(array([1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1))],
       [(array([1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1))],
@@ -50,7 +54,8 @@ Piece: test/test-files/piece.musicxml
       [(array([1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1))],
       [(array([1., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]), (1, 1))]]]]
 ```
-The final result is a nested container of pieces, each containing bars, each containing time slices (0.5 beats long), each containing simultaneous events.
+The final result is a nested container of pieces, each containing bars, each containing time slices (0.5 beats long),
+each containing simultaneous events.
 Each event has has a vector and set of labels generated according to the pattern specified by the formatter object.
 
 ## Features
