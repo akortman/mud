@@ -124,6 +124,10 @@ class Piece(object):
             s += pad + '[{}] {},\n'.format(i, str(bar))
         s += ']\n'
         return s
+
+    @property
+    def name(self):
+        return '' if self._name is None else self._name
     
     def __str__(self):
         return self.pretty_description()
