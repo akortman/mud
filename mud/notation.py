@@ -72,6 +72,9 @@ class Pitch(object):
     def strip_octave(self):
         return self.__class__(pitch=self._relative_pitch, octave=None)
 
+    def copy(self):
+        return self.__class__(self._relative_pitch, self._octave)
+
     def name(self):
         if self._octave is None:
             return self.__class__.relative_pitch_to_str[self._relative_pitch]
@@ -150,6 +153,9 @@ class Time(object):
         self._resolution = resolution
         self._time = resolution * round(self._time / resolution)
         return abs(t - self._time)
+
+    def copy(self):
+        return self.__class__(self._time, self._resolution)
 
     def resolution(self):
         return self._resolution
@@ -335,6 +341,9 @@ class Note(object):
     def set_duration(self, duration):
         self._duration = Time(duration)
 
+    def copy(self):
+        return self.__class__(note=self)
+
     # The iterator protocol is implemented so you can use `pitch, duration = Note(...)` syntax.
     def __iter__(self):
         return (self._pitch, self._duration).__iter__()
@@ -368,6 +377,9 @@ class Rest(object):
 
     def set_duration(self, duration):
         self._duration = Time(duration)
+    
+    def copy(self):
+        return self.__class__(self._duration)
 
     def __str__(self):
         return 'Rest [ {} ]'.format(self._duration.in_beats())
