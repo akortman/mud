@@ -39,8 +39,9 @@ mud.Piece[
 Piece: test/test-files/piece.musicxml
     {Bar 0} (Time[0.0, resolution=0.0] to Time[4.0, resolution=32.0]):
         {Event 0.0} Note [ 'Db4', 4.0 ]
->>> formatter = mud.fmt.EventDataBuilder(features=(feature.IsNote(), feature.ContinuesNextEvent(), feature.NoteRelativePitch()),
-...                                      labels=(label.IsNote(), label.RelativePitchLabels(),  label.ContinuesNextEventLabel()))
+>>> formatter = mud.fmt.EventDataBuilder(
+...     features=(feature.IsNote(), feature.ContinuesNextEvent(), feature.NoteRelativePitch()),
+...     labels  =(label.IsNote(), label.RelativePitchLabels(), label.ContinuesNextEventLabel()))
 >>> data = corpus.format_data(formatter, slice_resolution=resolution)
 >>> from pprint import pprint
 >>> pprint([[[[(event.vec, event.labels) for event in ts.events] for ts in bar.timeslices]
