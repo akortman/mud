@@ -9,8 +9,8 @@ from .notation import Time
 class Event(object):
     def __init__(self, event, time=None):
         if isinstance(event, Event):
-            self._event = event._event
-            self._time = event._time
+            self._event = event._event.copy()
+            self._time = Time(event._time)
             if time is not None:
                 self._time = time
         else:
