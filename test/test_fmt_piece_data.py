@@ -84,4 +84,16 @@ class TestBarData(unittest.TestCase):
 
 class TestPieceData(unittest.TestCase):
     def test(self):
-        pass
+        p = mud.Piece()
+        p.build_from_spans(mud.Span([
+            (mud.Note('C4', 1), mud.Time(0)),
+            (mud.Note('G5', 1), mud.Time(0)),
+            (mud.Rest(      1), mud.Time(1)),
+            (mud.Note('C4', 2), mud.Time(2)),
+            (mud.Note('A4', 2), mud.Time(2)),
+        ]))
+        piece_data = mud.fmt.PieceData(p, formatter, slice_resolution=0.25)
+        
+        self.assertEqual(len(piece_data.bars), 1)
+        self.assertTrue(isinstance(piece_data.bars[0], mud.fmt.BarData))
+        self.assertTrue(len(piece_data.bars[0].timeslices), 16)
