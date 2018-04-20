@@ -39,8 +39,9 @@ class Corpus(AbstractCorpus):
     def size(self):
         return len(self._pieces)
 
+    @property
     def pieces(self):
-        return self._pieces.__iter__()
+        return self._pieces
 
     def load_piece(self, piece):
         self._pieces.append(Piece(piece))
@@ -58,7 +59,7 @@ class Corpus(AbstractCorpus):
 
 class DataCorpus(AbstractCorpus):
     def __init__(self, corpus, formatter, slice_resolution):
-        self._data = [PieceData(p, formatter, slice_resolution) for p in corpus.pieces()]
+        self._data = [PieceData(p, formatter, slice_resolution) for p in corpus.pieces]
 
     def size(self):
         return len(self._data)

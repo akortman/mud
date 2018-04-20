@@ -8,7 +8,7 @@ class TestCorpus(unittest.TestCase):
                                       'test/test-files/piece.musicxml'))
         self.assertEqual(corpus.size(), 2)
         expected_bars = (27, 1)
-        for piece, num_expected_bars in zip(corpus.pieces(), expected_bars):
+        for piece, num_expected_bars in zip(corpus.pieces, expected_bars):
             self.assertEqual(piece.num_bars(), num_expected_bars)
 
     def test_filter(self):
@@ -17,7 +17,7 @@ class TestCorpus(unittest.TestCase):
                                       'test/test-files/piece.musicxml'),
                             filters=(filter_is_short,))
         self.assertEqual(corpus.size(), 1)
-        for p in corpus.pieces():
+        for p in corpus.pieces:
             self.assertEqual(p.num_bars(), 1)
 
     def test_io(self):
@@ -32,7 +32,7 @@ class TestCorpus(unittest.TestCase):
 
         new_corpus = mud.Corpus(from_file=new_corpus_path)
         self.assertEqual(corpus.size(), new_corpus.size())
-        for piece, expected_name in zip(new_corpus.pieces(), files):
+        for piece, expected_name in zip(new_corpus.pieces, files):
             self.assertEqual(piece.name, expected_name)
 
         os.remove(new_corpus_path)
