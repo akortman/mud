@@ -176,3 +176,24 @@ class ContinuesNextEvent(EventFeature):
         except AttributeError:
             pass
         return np.zeros(1)
+
+class BooleanFlag(EventFeature):
+    '''
+    Flags with a 1 if flag_name=True in additional args.
+    '''
+    def __init__(self, flag_name):
+        self.flag_name = flag_name
+
+    def dim(self):
+        return 1
+
+    def make_subvector(self, event, **kwargs):
+        if self.flag_name in kwargs and kwargs[self.flag_name]:
+            return np.ones(1)
+        return np.zeros(1)
+
+# Helper functions
+def StartOfSequence():
+    return BooleanFlag('sos')
+def EndOfSequence():
+    return BooleanFlag('eos')

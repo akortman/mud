@@ -146,3 +146,25 @@ class ContinuesNextEventLabel(Labels):
         except AttributeError:
             pass
         return 0
+
+class BooleanFlag(Labels):
+    '''
+    Flags with a label of 1 if flag_name=True, otherwise 0
+    '''
+    def __init__(self, flag_name):
+        self.flag_name = flag_name
+    
+    @property
+    def num_labels(self):
+        return 2
+        
+    def get_event_label(self, event, **kwargs):
+        if self.flag_name in kwargs and kwargs[self.flag_name]:
+            return 1
+        return 0
+
+# Helper functions
+def StartOfSequence():
+    return BooleanFlag('sos')
+def EndOfSequence():
+    return BooleanFlag('eos')

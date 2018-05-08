@@ -147,3 +147,23 @@ class TestContinuesNextEvent(unittest.TestCase):
         self.assertEqual(v.shape, (1,))
         self.assertAlmostEqual(v[0], 1.0)
 
+class TestBooleanFlag(unittest.TestCase):
+    def test(self):
+        f = feature.BooleanFlag('flag')
+        self.assertEqual(f.dim(), 1)
+        
+        event = mud.Event(mud.Note('A6', mud.Time(4.0)), mud.Time(0.0))
+
+        v = f.make_subvector(event)
+        self.assertEqual(v.shape, (1,))
+        self.assertAlmostEqual(v[0], 0.0)
+
+        v = f.make_subvector(event, flag=False)
+        self.assertEqual(v.shape, (1,))
+        self.assertAlmostEqual(v[0], 0.0)
+
+        v = f.make_subvector(event, flag=True)
+        self.assertEqual(v.shape, (1,))
+        self.assertAlmostEqual(v[0], 1.0)
+
+
