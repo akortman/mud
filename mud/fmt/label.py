@@ -21,7 +21,7 @@ class Labels(object):
     @property
     def num_labels(self):
         raise NotImplementedError
-    def get_event_label(self, event):
+    def get_event_label(self, event, **kwargs):
         raise NotImplementedError
 
 class PitchLabels(Labels):
@@ -37,7 +37,7 @@ class PitchLabels(Labels):
     def num_labels(self):
         return self._num_labels
 
-    def get_event_label(self, event):
+    def get_event_label(self, event, **kwargs):
         return self.get_label_of(event.pitch())
 
     def get_label_of(self, pitch):
@@ -75,7 +75,7 @@ class RelativePitchLabels(Labels):
     def num_labels(self):
         return self._num_labels
 
-    def get_event_label(self, event):
+    def get_event_label(self, event, **kwargs):
         return self.get_label_of(event.pitch())
 
     def get_label_of(self, pitch):
@@ -101,7 +101,7 @@ class IsNote(Labels):
     def num_labels(self):
         return 2
         
-    def get_event_label(self, event):
+    def get_event_label(self, event, **kwargs):
         return int(event.is_note())
 
 class IsRest(Labels):
@@ -112,7 +112,7 @@ class IsRest(Labels):
     def num_labels(self):
         return 2
         
-    def get_event_label(self, event):
+    def get_event_label(self, event, **kwargs):
         return int(event.is_rest())
 
 class ContinuingPreviousEventLabel(Labels):
@@ -123,7 +123,7 @@ class ContinuingPreviousEventLabel(Labels):
     def num_labels(self):
         return 2
 
-    def get_event_label(self, event):
+    def get_event_label(self, event, **kwargs):
         try:
             if not event.is_note_start():
                 return 1
@@ -139,7 +139,7 @@ class ContinuesNextEventLabel(Labels):
     def num_labels(self):
         return 2
         
-    def get_event_label(self, event):
+    def get_event_label(self, event, **kwargs):
         try:
             if not event.is_note_end():
                 return 1

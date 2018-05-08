@@ -11,7 +11,7 @@ class Feature(object):
     def dim(self):
         raise NotImplementedError
 
-    def make_subvector(self, event):
+    def make_subvector(self, event, **kwargs):
         raise NotImplementedError
 
 class EventFeature(Feature):
@@ -24,7 +24,7 @@ class IsNote(EventFeature):
     def dim(self):
         return 1
 
-    def make_subvector(self, event):
+    def make_subvector(self, event, **kwargs):
         if event.is_note():
             return np.ones(1)
         else:
@@ -37,7 +37,7 @@ class IsRest(EventFeature):
     def dim(self):
         return 1
 
-    def make_subvector(self, event):
+    def make_subvector(self, event, **kwargs):
         if event.is_rest():
             return np.ones(1)
         else:
@@ -57,7 +57,7 @@ class NotePitch(EventFeature):
     def dim(self):
         return self._dim
 
-    def make_subvector(self, event):
+    def make_subvector(self, event, **kwargs):
         p = event.pitch()
         if p is None:
             return np.zeros(self._dim)
@@ -88,7 +88,7 @@ class NoteRelativePitch(EventFeature):
     def dim(self):
         return self._dim
 
-    def make_subvector(self, event):
+    def make_subvector(self, event, **kwargs):
         try:
             rp = event.pitch().relative_pitch()
         except AttributeError:
@@ -111,7 +111,7 @@ class NoteOctave(EventFeature):
     def _label_of_octave(self, octave):
         return octave - self._octave_range[0]
 
-    def make_subvector(self, event):
+    def make_subvector(self, event, **kwargs):
         p = event.pitch()
         if p is None:
             return np.zeros(self.dim())
@@ -130,7 +130,7 @@ class NoteOctaveContinuous(EventFeature):
     def dim(self):
         return 1
 
-    def make_subvector(self, event):
+    def make_subvector(self, event, **kwargs):
         try:
             octave = event.pitch().octave()
         except AttributeError:
@@ -150,7 +150,7 @@ class ContinuingPreviousEvent(EventFeature):
     def dim(self):
         return 1
 
-    def make_subvector(self, event):
+    def make_subvector(self, event, **kwargs):
         try:
             if not event.is_note_start():
                 return np.ones(1)
@@ -169,7 +169,7 @@ class ContinuesNextEvent(EventFeature):
     def dim(self):
         return 1
 
-    def make_subvector(self, event):
+    def make_subvector(self, event, **kwargs):
         try:
             if not event.is_note_end():
                 return np.ones(1)

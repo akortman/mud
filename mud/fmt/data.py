@@ -43,24 +43,24 @@ class EventDataBuilder(DataBuilder):
     def dim(self):
         return self._vec_len
 
-    def _make_numpy_subvectors(self, event):
-        return [feature.make_subvector(event) for feature in self._features]
+    def _make_numpy_subvectors(self, event, **kwargs):
+        return [feature.make_subvector(event, **kwargs) for feature in self._features]
 
-    def _make_numpy_vector(self, event):
-        return np.concatenate(self._make_numpy_subvectors(event))
+    def _make_numpy_vector(self, event, **kwargs):
+        return np.concatenate(self._make_numpy_subvectors(event, **kwargs))
 
     def _assert_is_event(self, event):
         if not isinstance(event, Event):
             raise ValueError('EventVectorBuilder only formats Events')
 
-    def make_vector(self, event, library=None):
+    def make_vector(self, event, library=None, **kwargs):
         self._assert_is_event(event)
-        return _numpy_to_output_library_format(self._make_numpy_vector(event),
+        return _numpy_to_output_library_format(self._make_numpy_vector(event, **kwargs),
                                                self._output_library if library is None else library)
 
-    def make_labels(self, event, library=None):
+    def make_labels(self, event, library=None, **kwargs):
         self._assert_is_event(event)
-        return tuple(l.get_event_label(event) for l in self._labels)
+        return tuple(l.get_event_label(event, **kwargs) for l in self._labels)
 
 
 
