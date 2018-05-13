@@ -163,7 +163,7 @@ class Time(object):
     def in_resolution_steps(self):
         if self._resolution is None:
             raise ValueError('Can\'t give number of resolution steps in unquantized Time')
-        return self._time / self._resolution
+        return int(self._time / self._resolution)
 
     def in_beats(self):
         return self._time
@@ -181,8 +181,8 @@ class Time(object):
 
     def __str__(self):
         if self.is_quantized:
-            return 'Time[{}, resolution={}]'.format(self._time, self.in_resolution_steps())
-        return 'Time[{}]'.format(self._time)
+            return f'Time[{self._time}, resolution={self._resolution}, steps={self.in_resolution_steps()}]'
+        return f'Time[{self._time}]'
 
     def __repr__(self):
         return self.__str__()
