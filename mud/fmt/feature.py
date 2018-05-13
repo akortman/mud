@@ -100,15 +100,22 @@ class NoteOctave(EventFeature):
     '''
     Generates feature vectors marking the labelled octave of a note.
     '''
-    def __init__(self, octave_range):
+    def __init__(self, octave_range, saturate=False):
         if len(octave_range) != 2 or octave_range[0] > octave_range[1]:
             raise ValueError
         self._octave_range = octave_range
+        self._saturate = saturate
 
     def dim(self):
         return 1 + self._octave_range[1] - self._octave_range[0]
 
     def _label_of_octave(self, octave):
+        if octave < self._octave_range[0]:
+            if self._saturate: return self._octave_range[0]
+            raise ValueError('octave out of range')
+        if octave > self._octave_range[1]:
+            if self._saturate: return self._octave_range[1]
+            raise ValueError('octave out of range')
         return octave - self._octave_range[0]
 
     def make_subvector(self, event, **kwargs):
