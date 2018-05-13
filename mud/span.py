@@ -71,7 +71,7 @@ class Span(object):
     def sort(self):
         self._events.sort(key=lambda e: (e.time().in_resolution_steps(),
                                          e.pitch().midi_pitch(assumed_octave=4)
-                                            if (e.pitch() is not None) else None))
+                                            if (e.pitch() is not None) else 0))
 
     def get_slice(self, slice_range):
         return TimeSlice(self, slice_range)
