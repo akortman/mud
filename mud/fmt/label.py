@@ -93,6 +93,34 @@ class RelativePitchLabels(Labels):
         except KeyError:
             raise ValueError("Label {} does is not associated with a pitch".format(int(label)))
 
+''' untested '''
+class OctaveLabels(Labels):
+    def __init__(self, octave_range, saturate=False):
+        self._octave_range = octave_range
+        self._num_octaves = 1 + max(octave_range) - min(octave_range)
+        self._saturate = saturate
+
+    @property
+    def num_labels(self):
+        return self._num_octaves
+
+    def get_event_label(self, event, **kwargs):
+        return self.get_octave_label(event.pitch().octave())
+
+    def get_octave_label(self, octave):
+        if octave < min(self._octave_range):
+            if self._saturate: return min(self._octave_range)
+            return None
+        if octave > max(self._octave_range):
+            if self._saturate: return max(self._octave_range)
+            return None
+        return octave - min(self._octave_range)
+
+    def get_value_of(self, label):
+        if label < 0 or label >= self._num_octaves:
+            return None
+        return label + min(self._octave_range)
+
 class IsNote(Labels):
     def __init__(self):
         pass
