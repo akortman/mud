@@ -105,7 +105,10 @@ class OctaveLabels(Labels):
         return self._num_octaves
 
     def get_event_label(self, event, **kwargs):
-        return self.get_octave_label(event.pitch().octave())
+        p = event.pitch()
+        if p is None:
+            return None
+        return self.get_octave_label(p.octave())
 
     def get_octave_label(self, octave):
         if octave < min(self._octave_range):
