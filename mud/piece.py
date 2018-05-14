@@ -8,7 +8,7 @@ from .span import Span
 from .event import Event
 
 class Piece(object):
-    def __init__(self, piece=None):
+    def __init__(self, piece=None, discard_rests=False):
         self.init_empty()
         if piece is None:
             return
@@ -16,6 +16,9 @@ class Piece(object):
             self.load_file(piece)
         else:
             raise NotImplementedError('currently Piece only supports loading from file or empty initialization')
+
+        if discard_rests:
+            self.discard_rests()
 
     def init_empty(self, name=None):
         self._bars = []
@@ -106,6 +109,10 @@ class Piece(object):
             for event in bar:
                 event.unwrap().duration().quantize()
                 event.time().quantize()
+
+    def discard_rests(self):
+        for span in self._bars:
+            span.discard_rests()
 
     def pprint(self):
         print('Piece: {}'.format('' if self._name is None else self._name))
