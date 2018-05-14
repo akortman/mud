@@ -7,16 +7,23 @@ class EventData(object):
 
 class TimeSliceData(object):
     def __init__(self, timeslice, formatter, discard_rests=False):
-        is_rest = (discard_rests and all(event.is_rest() for event in timeslice))
+        sliced_events = list(timeslice.sliced_events())
+        is_rest = (discard_rests and all(event.is_rest() for event in sliced_events))
         if is_rest:
             self.events = []
         else:
-            self.events = [EventData(e, formatter) for e in timeslice.sliced_events()]
+            self.events = [EventData(e, formatter) for e in sliced_events]
+
+    def __iter__(self):
+        return self.events.__iter__()
 
 class BarData(object):
     def __init__(self, bar, formatter, slice_resolution, discard_rests=False):
         self.timeslices = [TimeSliceData(ts, formatter, discard_rests)
                            for ts in bar.generate_slices(slice_resolution)]
+
+    def __iter__(self):
+        return self.timeslices.__iter__()
 
 class PieceData(object):
     '''
@@ -35,4 +42,7 @@ class PieceData(object):
         for bar in piece.bars():
             fmt_bar = BarData(bar, formatter, slice_resolution, discard_rests)
             self.bars.append(fmt_bar)
+
+    def __iter__(self):
+        return self.bars.__iter__()
 
