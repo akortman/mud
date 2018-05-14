@@ -13,10 +13,15 @@ class Span(object):
         where e is a the object wrapped by the event (Note, Rest, etc)
         and   t is a mud.Time (the offset from the start of the span)
         '''
-        self._events = []
-        if type(offset) is not int and type(offset) is not float and type(offset) is not Time:
+        if (type(offset) is not int
+                and type(offset) is not float
+                and type(offset) is not Time):
             raise ValueError('Cannot construct offset from value of type {}'.format(type(offset)))
+
+        self._events = []
         self._offset = Time(offset)
+        self._padded_length = None
+
         for e in events:
             if type(e) is Event:
                 self.append_event(e)
@@ -40,6 +45,9 @@ class Span(object):
             # disallow events with 0 duration from being in the Span
             return
         self._events.append(event)
+        if (self._padded_length is not None
+                and self.calculate_span_length() > self._padded_length):
+            self._padded_length = None
 
     def calculate_span_length(self):
         if len(self._events) == 0:
@@ -62,6 +70,8 @@ class Span(object):
         return len(self._events)
 
     def length(self):
+        if self._padded_length is not None:
+            return Time(self._padded_length)
         return Time(self.calculate_span_length())
 
     def offset(self):
@@ -82,11 +92,14 @@ class Span(object):
 
     def generate_slices(self, slice_resolution):
         t = 0.0
-        while t < self.calculate_span_length():
+        while t < self.length().in_beats():
             yield self.get_slice((t, t + slice_resolution))
             t += slice_resolution
 
     def discard_rests(self):
+        # Save the length including rests to maintain correct length.
+        if self._padded_length is None:
+            self._padded_length = self.length()
         deletion = []
         for i, event in enumerate(self._events):
             if event.is_rest():
