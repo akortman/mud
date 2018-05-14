@@ -11,6 +11,11 @@ class OutputLibrary(enum.Enum):
     NUMPY = 1
     TORCH = 2
 
+str_to_lib = {
+    'numpy': OutputLibrary.NUMPY,
+    'torch': OutputLibrary.TORCH,
+}
+
 def _numpy_to_output_library_format(nparray, output_library):
     if output_library is OutputLibrary.NUMPY:
         return nparray
@@ -34,11 +39,11 @@ class EventDataBuilder(DataBuilder):
     '''
     Class that builds vectors and labels from Events.
     '''
-    def __init__(self, features, labels, default_library=OutputLibrary.NUMPY):
+    def __init__(self, features, labels, library=OutputLibrary.NUMPY):
         self._features = features
         self._labels = labels
         self._vec_len = sum(f.dim() for f in features)
-        self._output_library = default_library
+        self._output_library = str_to_lib[library] if isinstance(library, str) else library
 
     def dim(self):
         return self._vec_len
