@@ -71,7 +71,20 @@ class Piece(object):
 
         return self
 
+    def to_music21_stream(self):
+        raise NotImplementedError
+
+    def save(self, f):
+        raise NotImplementedError
+        
+    @classmethod
+    def from_spans(cls, *spans):
+        p = cls()
+        p.build_from_spans(*spans)
+        return p
+
     def build_from_spans(self, *spans):
+        # TODO: Rename
         self.init_empty()
         self._bars.extend(spans)
 
