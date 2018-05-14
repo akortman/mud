@@ -20,7 +20,7 @@ class AbstractCorpus(object):
             self.__dict__ = pickle.load(f)
 
 class Corpus(AbstractCorpus):
-    def __init__(self, patterns=tuple(), filters=tuple(), from_file=None):
+    def __init__(self, patterns=tuple(), filters=tuple(), from_file=None, discard_rests=False):
         '''
         Load a corpus of pieces.
         patterns: an iterable of patterns (ie '*.musicxml') to load into the corpus.
@@ -36,6 +36,8 @@ class Corpus(AbstractCorpus):
                 for fname in iglob(pattern):
                     self.load_piece(fname)
         self.filter(*filters)
+        if discard_rests:
+            self.discard_rests()
 
     def size(self):
         return len(self._pieces)
@@ -63,6 +65,10 @@ class Corpus(AbstractCorpus):
         for f in filters:
             self._pieces = [p for p in self._pieces if f(p)]
         self._num_rejected += len_old - len(self._pieces)
+
+    def discard_rests(self):
+        for piece in self._pieces:
+            piece.discard_rests()
 
 class DataCorpus(AbstractCorpus):
     def __init__(self, corpus, formatter, slice_resolution, discard_rests=False):
