@@ -7,7 +7,7 @@ from .notation import Rest, Note, Pitch, Time
 from .timeslice import TimeSlice
 
 class Span(object):
-    def __init__(self, events, offset=0, length=None, sort=True):
+    def __init__(self, events, offset=0, length=None, sort=True, discard_rests=False):
         '''
         events must be a list of Events, or a list of (e, t) tuples,
         where e is a the object wrapped by the event (Note, Rest, etc)
@@ -28,6 +28,8 @@ class Span(object):
             assert actual_length <= length + 0.0001
             self.pad_to_length(length)
             assert actual_length >= length - 0.0001
+        if discard_rests:
+            self.discard_rests()
         if sort:
             self.sort()
 
@@ -40,6 +42,8 @@ class Span(object):
         self._events.append(event)
 
     def calculate_span_length(self):
+        if len(self._events) == 0:
+            return 0.0
         end_positions = [event.time().in_beats()
                          + event.unwrap().duration().in_beats()
                          for event in self._events]
@@ -81,6 +85,21 @@ class Span(object):
         while t < self.calculate_span_length():
             yield self.get_slice((t, t + slice_resolution))
             t += slice_resolution
+
+    def discard_rests(self):
+        deletion = []
+        for i, event in enumerate(self._events):
+            if event.is_rest():
+                deletion.append(i)
+        num_events_before_removal = len(self._events)
+        deletion.reverse()
+        for i in deletion:
+            del self._events[i]
+
+        # Sanity check.
+        assert len(self._events) == num_events_before_removal - len(deletion)
+        for event in self._events:
+            assert not event.is_rest()
 
     def pprint(self):
         print('Span:')
