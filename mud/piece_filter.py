@@ -43,12 +43,15 @@ class NotesWithinRange(PieceFilter):
     def test(self, piece):
         raise NotImplementedError
 
-class TimeSignature(PieceFilter):
+class BarLengthIs(PieceFilter):
     '''
     Tests whether the pieces are in the given time signatures.
     '''
-    def __init__(self, *time_signatures):
-        raise NotImplementedError
+    def __init__(self, bar_length):
+        self._bar_length = bar_length
 
     def test(self, piece):
-        raise NotImplementedError
+        for bar in piece.bars():
+            if bar.calculate_span_length() != self._bar_length:
+                return False
+        return True
