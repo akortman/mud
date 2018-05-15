@@ -28,9 +28,15 @@ class Piece(object):
 
     def load_file(self, path, save_key=False, transpose_to=None):
         s = mu.converter.parse(path)
-        return self.from_music21_stream(s, save_key, transpose_to, name=path)
+        return self.from_music21_stream_inplace(s, save_key, transpose_to, name=path)
 
-    def from_music21_stream(self, s, save_key=False, transpose_to=None, name=None):
+    @classmethod
+    def from_music21_stream(cls, s, save_key=False, transpose_to=None, name=None):
+        p = cls()
+        p.from_music21_stream_inplace(s, save_key, transpose_to, name)
+        return p
+
+    def from_music21_stream_inplace(self, s, save_key=False, transpose_to=None, name=None):
         self.init_empty(name=name)
         s = s.flat
 
@@ -71,11 +77,31 @@ class Piece(object):
 
         return self
 
-    def to_music21_stream(self):
-        raise NotImplementedError
+    def to_music21_stream(self, time_sig=None):
+        s = mu.stream.Stream()
+        if time_sig is not None:
+            s.timeSignature = mu.meter.TimeSignature(time_sig)
 
-    def save(self, f):
-        raise NotImplementedError
+        # music21 appends a quarter note rest at the start of the MIDI for some reason.
+        # To make it line up nicely in a MIDI editor, we add an initial rest.
+        #s.append(mu.note.Rest(quarterLength=3))
+
+        #s.append(mu.note.Note(note.pitch, quarterLength=note.beats))
+        #s.append(mu.note.Rest(quarterLength=note.beats))
+        for span in self._bars:
+            for event in span:
+                if event.is_note():
+                    ev_mu = mu.note.Note(event.pitch().name())
+                else:
+                    ev_mu = mu.note.Rest()
+                ev_mu.quarterLength = event.duration().in_beats()
+                ev_mu.offset = span.offset().in_beats() + event.time().in_beats()
+                s.append(ev_mu)
+        return s
+
+    def save(self, f, file_format='midi'):
+        s = self.to_music21_stream()
+        s.write(file_format, f)
         
     @classmethod
     def from_spans(cls, *spans):

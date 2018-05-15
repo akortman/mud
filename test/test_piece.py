@@ -43,3 +43,22 @@ class TestPiece(unittest.TestCase):
         bar = p.bars()[0]
         self.assertEqual(bar.num_events(), 15)
         self.assertAlmostEqual(bar.length(), 4.0)
+
+    def test_to_music21(self):
+        p0 = mud.Piece('./test/test-files/canon_in_d.mxl')
+        p_mu = p0.to_music21_stream()
+        p1 = mud.Piece.from_music21_stream(p_mu)
+        #p1.save('./test/test-temp/canon_in_d_copy_out.mid')
+        #p_mu.show('text')
+        #p1.pprint()
+
+        #self.assertEqual(p0.num_bars(), p1.num_bars())
+        for i, (barA, barB) in enumerate(zip(p0.bars(), p1.bars())):
+            self.assertEqual(barA.num_events(), barB.num_events(),
+                             f'bar[{i}] length discrepancy: {barA.num_events()} before stream '
+                             + f'conversion, {barB.num_events()} after')
+            barA.sort()
+            barB.sort()
+            for j, (eventA, eventB) in enumerate(zip(barA, barB)):
+                self.assertEqual(eventA, eventB)
+
