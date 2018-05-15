@@ -7,6 +7,14 @@ import numpy as np
 from .binary_vector import binvec
 from . import label
 
+def _pascal_case_to_snake_case(string):
+    res = []
+    for i, c in enumerate(string):
+        if i > 0 and c.istitle():
+            res.append('_')
+        res.append(c.tolower())
+        return ''.join(res)
+        
 class Feature(object):
     def dim(self):
         raise NotImplementedError
@@ -20,6 +28,14 @@ class Feature(object):
             return self._identifier
         except AttributeError:
             return None
+
+    @property
+    def arg_name(self):
+        try:
+            return self._arg_name
+        except AttributeError:
+            if self.identifier is None: return None
+            return _pascal_case_to_snake_case(self.identifier)
 
 class EventFeature(Feature):
     pass
