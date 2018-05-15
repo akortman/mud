@@ -19,6 +19,8 @@ class Event(object):
             self._event = event
             self._time = Time(time)
         assert type(self._time) is Time
+        self._post_continue = False
+        self._pre_continue = False
 
     def duration(self):
         return self._event.duration()
@@ -65,3 +67,9 @@ class Event(object):
             return False
         return (self._event == other._event
                 and self._time == other._time)
+    
+    def is_note_start(self):
+        return not self._pre_continue
+
+    def is_note_end(self):
+        return not self._post_continue

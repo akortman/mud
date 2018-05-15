@@ -29,12 +29,6 @@ class SlicedEvent(Event):
         if self._pre_continue:
             self._time = Time(slice_start)
 
-    def is_note_start(self):
-        return not self._pre_continue
-
-    def is_note_end(self):
-        return not self._post_continue
-
     def __str__(self):
         return 'SlicedEvent[{}, time={}, start={}, end={}]'.format(
             self._event, self._time, self.is_note_start(), self.is_note_end())
