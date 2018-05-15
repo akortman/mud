@@ -35,8 +35,8 @@ class TestPiece(unittest.TestCase):
         self.assertEqual(note, mud.Note('F#4', 1.0))
         self.assertEqual(time, mud.Time(3.0))
 
+    @unittest.skip('')
     def test_polyphonic(self):
-        return
         # mii channel theme from from https://musescore.com/pimplup/mii-channel-music
         p = mud.Piece('./test/test-files/mii_channel.mxl')
         self.assertEqual(p.num_bars(), 25)
