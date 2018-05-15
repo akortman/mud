@@ -14,12 +14,19 @@ class Feature(object):
     def make_subvector(self, event, **kwargs):
         raise NotImplementedError
 
+    @property
+    def identifier(self):
+        try:
+            return self._identifier
+        except AttributeError:
+            return None
+
 class EventFeature(Feature):
     pass
 
 class IsNote(EventFeature):
     def __init__(self):
-        pass
+        self._identifier = 'IsNote'
 
     def dim(self):
         return 1
@@ -32,7 +39,7 @@ class IsNote(EventFeature):
 
 class IsRest(EventFeature):
     def __init__(self):
-        pass
+        self._identifier = 'IsRest'
 
     def dim(self):
         return 1
@@ -51,6 +58,7 @@ class NotePitch(EventFeature):
         (labels are integers)
         see: mud.fmt.make_pitch_labels
         '''
+        self._identifier = 'NotePitch'
         self._pitch_labels = pitch_labels
         self._dim = pitch_labels.num_labels
 
@@ -75,6 +83,7 @@ class NoteRelativePitch(EventFeature):
         'labels' should be a dict that maps pitch strings (without octaves) to labels.
         (labels are integers)
         '''
+        self._identifier = 'NoteRelativePitch'
         if pitch_labels is None:
             self._pitch_labels = label.RelativePitchLabels()
         else:
@@ -101,6 +110,7 @@ class NoteOctave(EventFeature):
     Generates feature vectors marking the labelled octave of a note.
     '''
     def __init__(self, octave_range, saturate=False):
+        self._identifier = 'NoteOctave'
         if len(octave_range) != 2 or octave_range[0] > octave_range[1]:
             raise ValueError
         self._octave_range = octave_range
@@ -132,6 +142,7 @@ class NoteOctaveContinuous(EventFeature):
     it's a continuous 1, 2, 3, 4... with dimension 1.
     '''
     def __init__(self, rest_octave_value=0.0):
+        self._identifier = 'NoteOctaveContinuous'
         self._rest_octave_value = rest_octave_value
 
     def dim(self):
@@ -152,7 +163,7 @@ class ContinuingPreviousEvent(EventFeature):
     of a previous event.
     '''
     def __init__(self):
-        pass
+        self._identifier = 'ContinuingPreviousEvent'
 
     def dim(self):
         return 1
@@ -171,7 +182,7 @@ class ContinuesNextEvent(EventFeature):
     subsequent event.
     '''
     def __init__(self):
-        pass
+        self._identifier = 'ContinuesNextEvent'
 
     def dim(self):
         return 1
@@ -188,7 +199,8 @@ class BooleanFlag(EventFeature):
     '''
     Flags with a 1 if flag_name=True in additional args.
     '''
-    def __init__(self, flag_name):
+    def __init__(self, flag_name, identifier=None):
+        self._identifier = identifier if identifier is not None else f'{flag_name}_BooleanFlag'
         self.flag_name = flag_name
 
     def dim(self):

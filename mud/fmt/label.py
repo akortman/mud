@@ -23,9 +23,20 @@ class Labels(object):
         raise NotImplementedError
     def get_event_label(self, event, **kwargs):
         raise NotImplementedError
+    @property
+    def identifier(self):
+        ''' returns a unique string identifier that can
+            be used to retrieve the labeller later. '''
+        try:
+            return self._identifier
+        except AttributeError:
+            return None
+
+
 
 class PitchLabels(Labels):
     def __init__(self, octave_range, include_rest=False, rpitches='all'):
+        self._identifier = 'Pitch'
         self._include_rest = include_rest
         self._values_to_labels, self._num_labels = _make_pitch_labels(octave_range, rpitches)
         if include_rest:
@@ -62,6 +73,7 @@ class RelativePitchLabels(Labels):
         rpitches should be 'all' or an iterable of allowed pitches (or strings directly convertible to Pitches.)
 
         '''
+        self._identifier = 'RelativePitch'
         labels_list = _relative_pitches_all if rpitches == 'all' else rpitches
         self._labels_to_values = {i: Pitch(pitch).strip_octave() for i, pitch in enumerate(labels_list)}
         self._num_labels = len(self._labels_to_values.keys())
@@ -96,6 +108,7 @@ class RelativePitchLabels(Labels):
 ''' untested '''
 class OctaveLabels(Labels):
     def __init__(self, octave_range, saturate=False):
+        self._identifier = 'Octave'
         self._octave_range = octave_range
         self._num_octaves = 1 + max(octave_range) - min(octave_range)
         self._saturate = saturate
@@ -126,7 +139,7 @@ class OctaveLabels(Labels):
 
 class IsNote(Labels):
     def __init__(self):
-        pass
+        self._identifier = 'IsNote'
         
     @property
     def num_labels(self):
@@ -137,7 +150,7 @@ class IsNote(Labels):
 
 class IsRest(Labels):
     def __init__(self):
-        pass
+        self._identifier = 'IsRest'
         
     @property
     def num_labels(self):
@@ -148,7 +161,7 @@ class IsRest(Labels):
 
 class ContinuingPreviousEventLabel(Labels):
     def __init__(self):
-        pass
+        self._identifier = 'ContinuingPreviousEvent'
         
     @property
     def num_labels(self):
@@ -164,7 +177,7 @@ class ContinuingPreviousEventLabel(Labels):
 
 class ContinuesNextEventLabel(Labels):
     def __init__(self):
-        pass
+        self._identifier = 'ContinuesNextEvent'
         
     @property
     def num_labels(self):
@@ -182,7 +195,8 @@ class BooleanFlag(Labels):
     '''
     Flags with a label of 1 if flag_name=True, otherwise 0
     '''
-    def __init__(self, flag_name):
+    def __init__(self, flag_name, identifier=None):
+        self._identifier = identifier if identifier is not None else f'{flag_name}_BooleanFlag'
         self.flag_name = flag_name
     
     @property
