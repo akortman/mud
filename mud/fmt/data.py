@@ -67,6 +67,15 @@ class EventDataBuilder(DataBuilder):
         self._assert_is_event(event)
         return tuple(l.get_event_label(event, **kwargs) for l in self._labels)
 
-
-
-
+    def label_value(self, label_identifier, label):
+        '''
+        Get the value of a label given a particular identifier for a labeller (see `mud.fmt.label`)
+        Will throw if there are multiple labellers with the same identifier.
+        '''
+        labeller = [l for l in self._labels if l.identifier == label_identifier]
+        if len(labeller) == 0:
+            raise ValueError(f'Labeller \'{label_identifier}\' not found in EventDataBuilder')
+        if len(labeller) > 1:
+            raise ValueError(f'Ambiguous label identifier; multiple labellers ({len(labeller)}) found for \'{label_identifier}\'')
+        labeller = labeller[0]
+        return labeller.get_value_of(label)
