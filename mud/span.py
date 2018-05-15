@@ -7,7 +7,7 @@ from .notation import Rest, Note, Pitch, Time
 from .timeslice import TimeSlice
 
 class Span(object):
-    def __init__(self, events, offset=0, length=None, sort=True, discard_rests=False):
+    def __init__(self, events=None, offset=0, length=None, sort=True, discard_rests=False):
         '''
         events must be a list of Events, or a list of (e, t) tuples,
         where e is a the object wrapped by the event (Note, Rest, etc)
@@ -22,12 +22,13 @@ class Span(object):
         self._offset = Time(offset)
         self._padded_length = None
 
-        for e in events:
-            if type(e) is Event:
-                self.append_event(e)
-            else:
-                assert type(e[1]) is Time
-                self.append_event(Event(e[0], e[1]))
+        if events is not None:
+            for e in events:
+                if type(e) is Event:
+                    self.append_event(e)
+                else:
+                    assert type(e[1]) is Time
+                    self.append_event(Event(e[0], e[1]))
         if length is not None:
             actual_length = self.calculate_span_length()
             assert actual_length <= length + 0.0001
