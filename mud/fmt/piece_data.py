@@ -9,7 +9,7 @@ class TimeSliceData(object):
     def __init__(self, timeslice, formatter, discard_rests=False):
         sliced_events = list(timeslice.sliced_events())
         is_rest = (discard_rests and all(event.is_rest() for event in sliced_events))
-        if is_rest:
+        if is_rest and discard_rests:
             self.events = []
         else:
             self.events = [EventData(e, formatter) for e in sliced_events]
