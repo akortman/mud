@@ -96,7 +96,7 @@ class Piece(object):
                     ev_mu = mu.note.Rest()
                 ev_mu.quarterLength = event.duration().in_beats()
                 ev_mu.offset = span.offset().in_beats() + event.time().in_beats()
-                s.append(ev_mu)
+                s.insert(ev_mu)
         return s
 
     def save(self, f, file_format='midi'):
