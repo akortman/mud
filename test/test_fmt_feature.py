@@ -147,6 +147,34 @@ class TestContinuesNextEvent(unittest.TestCase):
         self.assertEqual(v.shape, (1,))
         self.assertAlmostEqual(v[0], 1.0)
 
+class TestSpanPosition(unittest.TestCase):
+    def test(self):
+        f = feature.SpanPosition(resolution=0.25, span_length=4.0)
+        self.assertEqual(f.dim(), 16)
+
+        event = mud.Event(mud.Note('E3', 1.0), 2.0)
+        v = f.make_subvector(event)
+
+        for i in range(16):
+            if i == 8:
+                self.assertAlmostEqual(v[i], 1.0)
+                continue
+            self.assertAlmostEqual(v[i], 0.0)
+
+class TestNoteLength(unittest.TestCase):
+    def test(self):
+        f = feature.NoteLength(resolution=0.5, max_length=4.0)
+        self.assertEqual(f.dim(), 8)
+
+        event = mud.Event(mud.Note('E3', 1.0), 2.0)
+        v = f.make_subvector(event)
+
+        for i in range(8):
+            if i == 2:
+                self.assertAlmostEqual(v[i], 1.0)
+                continue
+            self.assertAlmostEqual(v[i], 0.0)
+
 class TestBooleanFlag(unittest.TestCase):
     def test(self):
         f = feature.BooleanFlag('flag')

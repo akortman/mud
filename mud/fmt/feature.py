@@ -6,6 +6,7 @@ Each class takes an Event and generates a subvector, which are then concatenated
 import numpy as np
 from .binary_vector import binvec
 from . import label
+import math
 
 def _pascal_case_to_snake_case(string):
     res = []
@@ -210,6 +211,46 @@ class ContinuesNextEvent(EventFeature):
         except AttributeError:
             pass
         return np.zeros(1)
+
+class SpanPosition(EventFeature):
+    '''
+    Flags the position within the containing span.
+    (Pieces are by default broken up into bar spans.)
+    '''
+    def __init__(self, resolution, span_length):
+        self._identifier = 'SpanPosition'
+        self._resolution = resolution
+        self._num_steps = int(round(span_length / resolution))
+
+    def dim(self):
+        return self._num_steps
+
+    def make_subvector(self, event, **kwargs):
+        pos_label = int(round(event.time().in_beats() / self._resolution))
+        if pos_label >= self._num_steps:
+            raise ValueError
+        return binvec(self.dim(), (pos_label,))
+
+class NoteLength(EventFeature):
+    '''
+    Labels the length of a note, divided into a given resolution.
+    '''
+    def __init__(self, resolution, max_length, saturate=True):
+        self._identifier = 'SpanPosition'
+        self._resolution = resolution
+        self._saturate = saturate
+        self._num_steps = int(round(max_length / resolution))
+
+    def dim(self):
+        return self._num_steps
+
+    def make_subvector(self, event, **kwargs):
+        len_label = int(round(event.duration().in_beats() / self._resolution))
+        if len_label >= self._num_steps:
+            if not self._saturate:
+                raise ValueError
+            len_label = self._num_steps - 1
+        return binvec(self.dim(), (len_label,))
 
 class BooleanFlag(EventFeature):
     '''
