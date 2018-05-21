@@ -18,8 +18,6 @@ Recommended install is to clone `mud` and then `pip install .` in the base
 directory (with setup.py in it). Then `import mud` and continue.
 
 ## Minimal example
-Here, we make a corpus, filter it to a single piece (piece.musicxml, consisting of one C# whole note),
-and convert it to labels and feature vectors at an 0.5 beat/quarter note resolution.
 ```python
 import mud
 # Load a piece.
