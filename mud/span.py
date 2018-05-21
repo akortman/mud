@@ -22,6 +22,8 @@ class Span(object):
         self._offset = Time(offset)
         self._padded_length = None
 
+        if length is not None:
+            self._padded_length = length
         if events is not None:
             for e in events:
                 if type(e) is Event:
@@ -29,11 +31,6 @@ class Span(object):
                 else:
                     assert type(e[1]) is Time
                     self.append_event(Event(e[0], e[1]))
-        if length is not None:
-            actual_length = self.calculate_span_length()
-            assert actual_length <= length + 0.0001
-            self.pad_to_length(length)
-            assert actual_length >= length - 0.0001
         if discard_rests:
             self.discard_rests()
         if sort:
