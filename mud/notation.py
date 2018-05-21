@@ -22,7 +22,13 @@ class Pitch(object):
     }
 
     relative_pitch_to_str = [
-        'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'
+        'C',
+        'Db',
+        'D',
+        'Eb',
+        'E',
+        'F',
+        'Gb', 'G', 'Ab', 'A', 'Bb', 'B'
     ]
 
     def __init__(self, pitch, octave=None):
@@ -33,10 +39,12 @@ class Pitch(object):
             raise ValueError('octave must be None or >= 0')
             
         if type(pitch) is Pitch:
-            if octave is not None:
-                raise ValueError('If Pitch is made as a copy, it can\'t have an octave argument.')
             self._relative_pitch = pitch._relative_pitch
             self._octave = pitch._octave
+            if octave is not None:
+                if self._octave is not None:
+                    raise ValueError('Ambiguous octave in pitch construction: arg #0 has an octave marker, but arg #1 (explicit octave) is not None')
+                self._octave = octave
         elif type(pitch) is str:
             (self._relative_pitch, self._octave) = Pitch.pitch_string_to_pitch_octave_pair(pitch)
             # If the parsed string has an octave value AND we were given an octave value, raise an error.
@@ -124,7 +132,18 @@ class Pitch(object):
             pitch_part, octave_part = pitchstr[:pos], pitchstr[pos:]
             assert len(pitch_part) + len(octave_part) == len(pitchstr)
         octave = int(octave_part) if octave_part is not None else None
-        pitch = cls.str_to_relative_pitch[pitch_part]
+        try:
+            pitch = cls.str_to_relative_pitch[pitch_part]
+        except KeyError:
+            # Handle uncommon variants like 'E#'.
+            if pitch_part[-1] == '#':
+                pitch = cls.str_to_relative_pitch[pitch_part[:-1]] + 1
+            elif pitch_part[-1] in {'-', 'b'}:
+                pitch = cls.str_to_relative_pitch[pitch_part[:-1]] - 1
+            # Correct range of pitch in [0, 12)
+            if pitch < 0: pitch += 12
+            if pitch >= 12: pitch -= 12
+        assert pitch >= 0 and pitch < 12, f'Error: pitch string {pitch_part} produced out of range relative pitch'
         return pitch, octave
 
     @classmethod
