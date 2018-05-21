@@ -31,8 +31,8 @@ class Labels(object):
             return self._identifier
         except AttributeError:
             return None
-
-
+    def get_label_of(self, label):
+        raise NotImplementedError
 
 class PitchLabels(Labels):
     def __init__(self, octave_range, include_rest=False, rpitches='all'):
@@ -105,7 +105,6 @@ class RelativePitchLabels(Labels):
         except KeyError:
             raise ValueError("Label {} does is not associated with a pitch".format(int(label)))
 
-''' untested '''
 class OctaveLabels(Labels):
     def __init__(self, octave_range, saturate=False):
         self._identifier = 'Octave'
@@ -209,6 +208,11 @@ class SpanPosition(Labels):
         if pos_label >= self._num_steps:
             raise ValueError
         return pos_label
+    
+    def get_value_of(self, label):
+        if label < 0 or label >= self._num_steps:
+            return None
+        return self._resolution * label
 
 class NoteLength(Labels):
     '''
@@ -231,6 +235,11 @@ class NoteLength(Labels):
                 raise ValueError
             len_label = self._num_steps - 1
         return len_label
+    
+    def get_value_of(self, label):
+        if label < 0 or label >= self._num_steps:
+            return None
+        return self._resolution * label
 
 class BooleanFlag(Labels):
     '''
