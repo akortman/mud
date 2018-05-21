@@ -160,16 +160,19 @@ class Piece(object):
         for span in self._spans:
             span.discard_rests()
 
-    def pprint(self):
-        print('Piece: {}'.format('' if self._name is None else self._name))
-        if self._tonic is not None:
-            print('    tonic: {}'.format(self._tonic))
-        if self._key_mode is not None:
-            print('    mode: {}'.format(self._key_mode))
-        for i, bar in enumerate(self._spans):
-            print('    {{Bar {}}} ({} to {}):'.format(i, bar.offset(), bar.offset() + bar.length()))
-            for j, event in enumerate(bar):
-                print('        {{Event {}}} {}'.format(event.time().in_beats(), event.unwrap()))
+    def show(self, mode='text'):
+        if mode == 'text':
+            print('Piece: {}'.format('' if self._name is None else self._name))
+            if self._tonic is not None:
+                print('    tonic: {}'.format(self._tonic))
+            if self._key_mode is not None:
+                print('    mode: {}'.format(self._key_mode))
+            for i, bar in enumerate(self._spans):
+                print('    {{Bar {}}} ({} to {}):'.format(i, bar.offset(), bar.offset() + bar.length()))
+                for j, event in enumerate(bar):
+                    print('        {{Event {}}} {}'.format(event.time().in_beats(), event.unwrap()))
+        else:
+            raise ValueError(f'Unsupported mode argument to show(): {mode}')
 
     def pretty_description(self):
         pad = '    '
