@@ -112,6 +112,8 @@ class Piece(object):
     def build_from_spans(self, *spans):
         # TODO: Rename
         self.init_empty()
+        for bar in spans:
+            assert isinstance(bar, Span), 'please provide arguments as all `mud.Span`s'
         self._bars.extend(spans)
 
     def as_span(self):
