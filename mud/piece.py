@@ -168,7 +168,7 @@ class Piece(object):
             if self._key_mode is not None:
                 print('    mode: {}'.format(self._key_mode))
             for i, bar in enumerate(self._spans):
-                print('    {{Bar {}}} ({} to {}):'.format(i, bar.offset(), bar.offset() + bar.length()))
+                print('    {{Span {}}} ({} to {}):'.format(i, bar.offset(), bar.offset() + bar.length()))
                 for j, event in enumerate(bar):
                     print('        {{Event {}}} {}'.format(event.time().in_beats(), event.unwrap()))
         else:
