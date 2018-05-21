@@ -6,6 +6,7 @@ import music21 as mu
 from .notation import Pitch, Note, Rest, Time
 from .span import Span
 from .event import Event
+from .utils import deprecated
 
 class Piece(object):
     def __init__(self, piece=None, discard_rests=False):
@@ -21,7 +22,7 @@ class Piece(object):
             self.discard_rests()
 
     def init_empty(self, name=None):
-        self._bars = []
+        self._spans = []
         self._tonic = None
         self._key_mode = None
         self._name = name
@@ -73,7 +74,7 @@ class Piece(object):
                 events.append(Event(event_data, Time(elem.offset)))
             
             span = Span(events, offset=m.offset)
-            self._bars.append(span)
+            self._spans.append(span)
 
         return self
 
@@ -88,7 +89,7 @@ class Piece(object):
 
         #s.append(mu.note.Note(note.pitch, quarterLength=note.beats))
         #s.append(mu.note.Rest(quarterLength=note.beats))
-        for span in self._bars:
+        for span in self._spans:
             for event in span:
                 if event.is_note():
                     ev_mu = mu.note.Note(event.pitch().name())
@@ -114,26 +115,30 @@ class Piece(object):
         self.init_empty()
         for bar in spans:
             assert isinstance(bar, Span), 'please provide arguments as all `mud.Span`s'
-        self._bars.extend(spans)
+        self._spans.extend(spans)
 
     def as_span(self):
-        return Span.overlay(*self._bars)
+        return Span.overlay(*self._spans)
 
     def events(self):
         s = self.as_span()
         return s.__iter__()
 
     def count_events(self):
-        return sum(b.num_events() for b in self._bars)
+        return sum(b.num_events() for b in self._spans)
 
+    def num_spans(self):
+        return len(self._spans)
+
+    @deprecated('Use num_spans() instead')
     def num_bars(self):
-        return len(self._bars)
+        return len(self._spans)
 
     def length_in_beats(self):
-        return sum(b.length() for b in self._bars)
+        return sum(b.length() for b in self._spans)
 
     def bars(self):
-        return self._bars
+        return self._spans
     
     def transpose(self, interval):
         if type(interval) is not int:
@@ -146,13 +151,13 @@ class Piece(object):
         raise NotImplementedError
     
     def quantize_events(self, max_error=None):
-        for bar in self._bars:
+        for bar in self._spans:
             for event in bar:
                 event.unwrap().duration().quantize()
                 event.time().quantize()
 
     def discard_rests(self):
-        for span in self._bars:
+        for span in self._spans:
             span.discard_rests()
 
     def pprint(self):
@@ -161,7 +166,7 @@ class Piece(object):
             print('    tonic: {}'.format(self._tonic))
         if self._key_mode is not None:
             print('    mode: {}'.format(self._key_mode))
-        for i, bar in enumerate(self._bars):
+        for i, bar in enumerate(self._spans):
             print('    {{Bar {}}} ({} to {}):'.format(i, bar.offset(), bar.offset() + bar.length()))
             for j, event in enumerate(bar):
                 print('        {{Event {}}} {}'.format(event.time().in_beats(), event.unwrap()))
@@ -172,7 +177,7 @@ class Piece(object):
         s += 'mud.Piece[\n'
         s += pad + 'tonic: {},\n'.format(self._tonic)
         s += pad + 'mode: {},\n'.format(self._key_mode)
-        for i, bar in enumerate(self._bars):
+        for i, bar in enumerate(self._spans):
             s += pad + '[{}] {},\n'.format(i, str(bar))
         s += ']\n'
         return s
