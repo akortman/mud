@@ -236,7 +236,7 @@ class NoteLength(EventFeature):
     Labels the length of a note, divided into a given resolution.
     '''
     def __init__(self, resolution, max_length, saturate=True):
-        self._identifier = 'SpanPosition'
+        self._identifier = 'NoteLength'
         self._resolution = resolution
         self._saturate = saturate
         self._num_steps = int(round(max_length / resolution))
