@@ -125,6 +125,9 @@ class Span(object):
     def __iter__(self):
         return self._events.__iter__()
 
+    def __len__(self):
+        return len(self._events)
+
     def __str__(self):
         return ('Span[length={}, offset={}, ('
                 .format(self.calculate_span_length(), self._offset)
