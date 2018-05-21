@@ -191,6 +191,47 @@ class ContinuesNextEventLabel(Labels):
             pass
         return 0
 
+class SpanPosition(Labels):
+    '''
+    Labels the position of an event within a span.
+    '''
+    def __init__(self, resolution, span_length):
+        self._identifier = 'SpanPosition'
+        self._resolution = resolution
+        self._num_steps = int(round(span_length / resolution))
+
+    @property
+    def num_labels(self):
+        return self._num_steps
+        
+    def get_event_label(self, event, **kwargs):
+        pos_label = int(round(event.time().in_beats() / self._resolution))
+        if pos_label >= self._num_steps:
+            raise ValueError
+        return pos_label
+
+class NoteLength(Labels):
+    '''
+    Labels the position of an event within a span.
+    '''
+    def __init__(self, resolution, max_length, saturate=True):
+        self._identifier = 'NoteLength'
+        self._resolution = resolution
+        self._saturate = saturate
+        self._num_steps = int(round(max_length / resolution))
+
+    @property
+    def num_labels(self):
+        return self._num_steps
+        
+    def get_event_label(self, event, **kwargs):
+        len_label = int(round(event.duration().in_beats() / self._resolution))
+        if len_label >= self._num_steps:
+            if not self._saturate:
+                raise ValueError
+            len_label = self._num_steps - 1
+        return len_label
+
 class BooleanFlag(Labels):
     '''
     Flags with a label of 1 if flag_name=True, otherwise 0

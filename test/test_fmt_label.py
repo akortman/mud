@@ -51,7 +51,21 @@ class TestContinuesNextEventLabel(unittest.TestCase):
         sliced_event = mud.SlicedEvent((0.0, 3.5), event)
         self.assertFalse(sliced_event.is_note_end())
         self.assertEqual(l.get_event_label(sliced_event), 1)
-        
+
+class TestSpanPosition(unittest.TestCase):
+    def test(self):
+        l = label.SpanPosition(resolution=0.25, span_length=4.0)
+        self.assertEqual(l.num_labels, 16)
+        event = mud.Event(mud.Note('E3', 1.0), 2.0)
+        self.assertEqual(l.get_event_label(event), 8)
+
+class TestNoteLength(unittest.TestCase):
+    def test(self):
+        l = label.NoteLength(resolution=0.5, max_length=4.0)
+        self.assertEqual(l.num_labels, 8)
+        event = mud.Event(mud.Note('E3', 1.0), 2.0)
+        self.assertEqual(l.get_event_label(event), 2)
+
 class TestBooleanFlag(unittest.TestCase):
     def test(self):
         l = label.BooleanFlag('flag')
