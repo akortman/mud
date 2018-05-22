@@ -12,9 +12,7 @@ into formats ready for use in deep learning frameworks. Currently supported are 
 and `torch`, but most libraries should interface nicely with `numpy`)
 
 ## Installation
-`mud` is not on pip.
-
-Recommended install is to clone `mud` and then `pip install .` in the base
+Recommended install is to clone this repo and then `pip install .` in the base
 directory (with setup.py in it). Then `import mud` and continue.
 
 ## Minimal example
