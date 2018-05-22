@@ -41,7 +41,12 @@ piece.show()
 # If the rest data is unneeded:
 piece.discard_rests()
 piece.show()
-# The piece now contains 4 events, with the rest now removed.
+#   Piece: path/to/piece.musicxml
+#       {Span 0} (Time[0.0, resolution=0.125, steps=0] to Time[4.0, resolution=0.125, steps=32]):
+#           {Event 0.0} Note [ 'C4', 1.0 ]
+#           {Event 0.0} Note [ 'G5', 1.0 ]
+#           {Event 2.0} Note [ 'C4', 2.0 ]
+#           {Event 2.0} Note [ 'A4', 2.0 ]
 
 # Say we have a collection of pieces and want to use them in a machine learning model.
 # For each note, we want to produce a feature vector and a set of labels, arranged by piece and by bar.
@@ -69,10 +74,11 @@ event = mud.Event(mud.Note('C#6', 1.0), time=1.0)   # A quarter note with pitch 
                                                     # from the start of it's span (not piece)
 
 formatter.make_vector(event)
+# The first line is from NoteRelativePitch, the second from NoteLength
 # torch.FloatTensor([0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.  
 #                    0., 0., 0., 0., 1., 0., 0., 0.])
 
-formatter.make_labels
+formatter.make_labels(event)
 # (1, 5)
 
 # If we want to format the entire corpus produced earlier:
@@ -121,7 +127,8 @@ piece.show()
 #           {Event 2.0} Note [ 'A4', 2.0 ]
 
 # Now, to see all events occuring within time 2.5 to 3.0 (in beats/quarter notes):
-ts = piece.as_span().get_slice((2.5, 3.0))
+ts = piece.as_span().get_slice((2.5, 3.0))  # .as_span() returns the entire Piece expressed
+                                            # in a single Span. (.get_slice() is a Span method)
 from pprint import pprint
 pprint(ts.raw_events())
 #   [Event[Note [ 'C4', 2.0 ], time=Time[2.0, resolution=0.125]],
@@ -138,7 +145,7 @@ pprint(list(ts.sliced_events()))
 
 # It's also useful to check whether any of the contained events are smaller than the slice.
 # This is referred to as an 'atomic slice' by `mud`.
-if not ts.is_atomic_slice(): raise "this won\'t be raised"
+if not ts.is_atomic_slice(): raise "this won't be raised"
 ```
 
 Extensible input/label generation for musical events (currently notes and rests).
