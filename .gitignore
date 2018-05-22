@@ -102,3 +102,6 @@ ENV/
 
 # VS code config
 .vscode/
+
+# Test temporary files
+test/test-temp/
