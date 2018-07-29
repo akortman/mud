@@ -21,7 +21,7 @@ class AbstractCorpus(object):
             self.__dict__ = pickle.load(f)
 
 class Corpus(AbstractCorpus):
-    def __init__(self, patterns=tuple(), filters=tuple(), from_file=None, discard_rests=False, max_len=None, ignore_load_errors=False, verbose=False):
+    def __init__(self, patterns=tuple(), filters=tuple(), from_file=None, discard_rests=False, max_len=None, ignore_load_errors=False, verbose=False, transpose_to=None):
         '''
         Load a corpus of pieces.
         patterns: an iterable of patterns (ie '*.musicxml') to load into the corpus.
@@ -38,7 +38,7 @@ class Corpus(AbstractCorpus):
                 for pattern in patterns:
                     for fname in iglob(pattern):
                         try:
-                            self_.load_piece(fname, filters)
+                            self_.load_piece(fname, filters, transpose_to)
                         except (mu.exceptions21.StreamException, mu.musicxml.xmlToM21.MusicXMLImportException):
                             if verbose: print(f'    Failed to load file {fname}: ', end='')
                             if ignore_load_errors:
@@ -72,8 +72,8 @@ class Corpus(AbstractCorpus):
                 return False
         return True
 
-    def load_piece(self, piece, filters=tuple()):
-        p = Piece(piece)
+    def load_piece(self, piece, filters=tuple(), transpose_to=None):
+        p = Piece(piece, transpose_to)
         if self.passes_filters(p, filters):
             p = self._pieces.append(p)
 

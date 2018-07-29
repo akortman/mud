@@ -62,3 +62,11 @@ class TestPiece(unittest.TestCase):
             for j, (eventA, eventB) in enumerate(zip(barA, barB)):
                 self.assertEqual(eventA, eventB)
 
+    def test_transpose(self):
+        p0 = mud.Piece('./test/test-files/canon_in_d.mxl', transpose_to='C')
+        self.assertEqual(p0.tonic(), mud.Pitch('C'))
+        self.assertEqual(p0.mode(), 'major')
+        self.assertEqual(p0.key(), 'C')
+
+if __name__ == '__main__':
+    unittest.main()

@@ -9,12 +9,13 @@ from .event import Event
 from .utils import deprecated
 
 class Piece(object):
-    def __init__(self, piece=None, discard_rests=False):
+    def __init__(self, piece=None, discard_rests=False, transpose_to=None):
         self.init_empty()
         if piece is None:
+            assert transpose_to is None, "Empty initialization requires no transpose_to argument"
             return
         elif type(piece) is str:
-            self.load_file(piece)
+            self.load_file(piece, transpose_to)
         else:
             raise NotImplementedError('currently Piece only supports loading from file or empty initialization')
 
@@ -43,21 +44,26 @@ class Piece(object):
 
         # Get the key of the piece if required.
         if save_key or transpose_to is not None:
-            key = s.analyse('key')
+            key = s.analyze('key')
             self._tonic = Pitch.from_music21(key.tonic)
-            self._key_mode = key.mode 
+            self._key_mode = key.mode
+            assert self._tonic is not None
+            assert self._key_mode is not None
 
-        # transpose the piece if requiested.
         if transpose_to is not None:
+            # transpose the piece to the chosen pitch (in major/relative minor)
             if self._key_mode == 'major':
                 transpose_interval = mu.interval.Interval(key.tonic)
             elif self._key_mode == 'minor':
                 transpose_interval = mu.interval.Interval(key.relative.tonic)
             else:
                 raise NotImplementedError
-            transpose_to = Pitch(transpose_to)
             s = s.transpose(transpose_interval, mu.pitch.Pitch(Pitch(transpose_to).name()))
-
+            key = s.analyze('key')
+            self._tonic = Pitch.from_music21(key.tonic)
+            self._key_mode = key.mode
+            assert self._tonic is not None
+            assert self._key_mode is not None
         # Ensure the stream has bars
         if (not s.hasMeasures()):
             s.makeMeasures(inPlace=True)
@@ -77,6 +83,22 @@ class Piece(object):
             self._spans.append(span)
 
         return self
+
+    def tonic(self):
+        return self._tonic
+
+    def mode(self):
+        return self._key_mode
+
+    def key(self):
+        if self._tonic is None:
+            return None
+        assert self._key_mode is not None
+        if self._key_mode == 'major':
+            return self._tonic.name()
+        elif self._key_mode == 'major':
+            return f'{self._tonic.name()}m'
+        return f'{self._tonic.name()} {self._key_mode}'
 
     def to_music21_stream(self, time_sig=None):
         s = mu.stream.Stream()
