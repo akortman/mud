@@ -140,6 +140,8 @@ class Pitch(object):
                 pitch = cls.str_to_relative_pitch[pitch_part[:-1]] + 1
             elif pitch_part[-1] in {'-', 'b'}:
                 pitch = cls.str_to_relative_pitch[pitch_part[:-1]] - 1
+            else:
+                raise ValueError(f'Invalid pitch string {pitchstr}')
             # Correct range of pitch in [0, 12)
             if pitch < 0: pitch += 12
             if pitch >= 12: pitch -= 12
