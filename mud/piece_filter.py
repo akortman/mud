@@ -5,6 +5,11 @@ This module provides implementations of some predicate functions to use
 as filters.
 '''
 
+def failure_reason(filter):
+    if isinstance(filter, PieceFilter):
+        return filter.why()
+    return f"Failed on testing {filter.type}: filter"
+
 class PieceFilter(object):
     '''
     Generic filter object.
@@ -17,6 +22,9 @@ class PieceFilter(object):
 
     def __call__(self, piece):
         return self.test(piece)
+
+    def why(self):
+        return f"Unspecified rejection criteria ({type(self)})"
 
 class AtomicSlicable(PieceFilter):
     '''
@@ -32,6 +40,9 @@ class AtomicSlicable(PieceFilter):
                 if not ts.is_atomic_slice():
                     return False
         return True
+        
+    def why(self):
+        return f"Not atomic slicable with resolution {self._slice_resolution}"
 
 class NotesWithinRange(PieceFilter):
     '''
@@ -42,6 +53,9 @@ class NotesWithinRange(PieceFilter):
 
     def test(self, piece):
         raise NotImplementedError
+        
+    def why(self):
+        return f"Notes outside of range"
 
 class BarLengthIs(PieceFilter):
     '''
@@ -55,3 +69,6 @@ class BarLengthIs(PieceFilter):
             if bar.calculate_span_length() != self._bar_length:
                 return False
         return True
+        
+    def why(self):
+        return f"Bar length not {self._bar_length}"

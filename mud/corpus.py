@@ -5,6 +5,7 @@ import music21 as mu
 
 from .piece import Piece
 from .fmt.piece_data import PieceData
+from . import piece_filter
 
 class AbstractCorpus(object):
     def __init__(self):
@@ -38,7 +39,7 @@ class Corpus(AbstractCorpus):
                 for pattern in patterns:
                     for fname in iglob(pattern):
                         try:
-                            res = self_.load_piece(fname, filters, transpose_to)
+                            res, why = self_.load_piece(fname, filters, transpose_to)
                         except (mu.exceptions21.StreamException, mu.musicxml.xmlToM21.MusicXMLImportException):
                             if verbose: print(f'    Failed to load file {fname}: ', end='')
                             if ignore_load_errors:
@@ -50,7 +51,7 @@ class Corpus(AbstractCorpus):
                             if res:
                                 print(f'    loaded: {fname}')
                             else:
-                                print(f'    rejected: {fname}')
+                                print(f'    rejected: {fname}, {why}')
                         if max_len is not None and self_.size() >= max_len:
                             return
             load(self)
@@ -73,15 +74,16 @@ class Corpus(AbstractCorpus):
         for f in filters:
             if not f(piece):
                 self._num_rejected += 1
-                return False
-        return True
+                return False, piece_filter.failure_reason(f)
+        return True, "Passes"
 
     def load_piece(self, piece, filters=tuple(), transpose_to=None):
         p = Piece(piece, transpose_to)
-        if self.passes_filters(p, filters):
+        passes, reason = self.passes_filters(p, filters)
+        if passes:
             p = self._pieces.append(p)
-            return True
-        return False
+            return True, "Success"
+        return False, reason
 
     def format_data(self, formatter, slice_resolution, discard_rests=False):
         return DataCorpus(self, formatter, slice_resolution, discard_rests)
