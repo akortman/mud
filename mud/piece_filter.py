@@ -66,7 +66,7 @@ class BarLengthIs(PieceFilter):
 
     def test(self, piece):
         for bar in piece.bars():
-            if bar.calculate_span_length() != self._bar_length:
+            if bar.length().in_beats() != self._bar_length:
                 return False
         return True
         
