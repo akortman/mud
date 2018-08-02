@@ -150,6 +150,8 @@ class Pitch(object):
 
     @classmethod
     def from_music21(cls, pitch):
+        if pitch.octave is None:
+            return pitch.name.replace('-', 'b')
         return cls('{}{}'.format(pitch.name.replace('-', 'b'), pitch.octave))
 
 class Time(object):
