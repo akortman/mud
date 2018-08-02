@@ -38,7 +38,7 @@ class Corpus(AbstractCorpus):
                 for pattern in patterns:
                     for fname in iglob(pattern):
                         try:
-                            self_.load_piece(fname, filters, transpose_to)
+                            res = self_.load_piece(fname, filters, transpose_to)
                         except (mu.exceptions21.StreamException, mu.musicxml.xmlToM21.MusicXMLImportException):
                             if verbose: print(f'    Failed to load file {fname}: ', end='')
                             if ignore_load_errors:
@@ -46,7 +46,11 @@ class Corpus(AbstractCorpus):
                                 continue
                             if verbose: print('failing (use `ignore_load_errors=True` in corpus to prevent)')
                             raise
-                        if verbose: print(f'    loaded {fname}')
+                        if verbose:
+                            if res:
+                                print(f'    loaded: {fname}')
+                            else:
+                                print(f'    rejected: {fname}')
                         if max_len is not None and self_.size() >= max_len:
                             return
             load(self)
@@ -76,6 +80,8 @@ class Corpus(AbstractCorpus):
         p = Piece(piece, transpose_to)
         if self.passes_filters(p, filters):
             p = self._pieces.append(p)
+            return True
+        return False
 
     def format_data(self, formatter, slice_resolution, discard_rests=False):
         return DataCorpus(self, formatter, slice_resolution, discard_rests)
