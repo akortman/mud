@@ -75,6 +75,22 @@ class Span(object):
     def offset(self):
         return self._offset
 
+    def is_monophonic(self):
+        # maintain a list of range (start, end) pairs for each note
+        ranges = []
+        # helper function to test if two ranges overlap
+        def overlap(r1, r2):
+            return (r1[0] <= r2[1] and r1[1] >= r2[0])
+        for event in self._events:
+            event_range = (event.time().in_beats(),
+                           event.time().in_beats() + event.duration().in_beats())
+            # This can be optimized to use binary search in the future.
+            for r in ranges:
+                if overlap(event_range, r):
+                    return False
+            ranges.append(event_range)
+        return True
+
     def move_offset_to_events(self):
         for i, _ in enumerate(self._events):
             self._events[i]._time += self._offset

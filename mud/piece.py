@@ -161,6 +161,9 @@ class Piece(object):
 
     def bars(self):
         return self._spans
+
+    def is_monophonic(self):
+        return self.as_span().is_monophonic()
     
     def transpose(self, interval):
         if type(interval) is not int:

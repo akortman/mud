@@ -113,3 +113,19 @@ class TestSpan(unittest.TestCase):
         ts = list(span.generate_slices(0.5))
         self.assertAlmostEqual(len(ts), 8)
         self.assertAlmostEqual(float(len(ts)), span.length().in_beats() / 0.5)
+
+    def test_is_monophonic(self):
+        span1 = mud.Span([
+                (mud.Note('C4', 1), mud.Time(0)),
+                (mud.Note('A4', 2), mud.Time(2)),
+            ], length=4, offset=4)
+        self.assertTrue(span1.is_monophonic())
+        span2 = mud.Span([
+                (mud.Note('C4', 1), mud.Time(0)),
+                (mud.Note('G5', 1), mud.Time(0)),
+                (mud.Rest(      1), mud.Time(1)),
+                (mud.Note('C4', 2), mud.Time(2)),
+                (mud.Note('A4', 2), mud.Time(2)),
+            ], length=4, offset=4)
+        self.assertTrue(not span2.is_monophonic())
+

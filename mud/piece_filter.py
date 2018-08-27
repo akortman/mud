@@ -72,3 +72,16 @@ class BarLengthIs(PieceFilter):
         
     def why(self):
         return f"Bar length not {self._bar_length}"
+
+class IsMonophonic(PieceFilter):
+    '''
+    Tests whether the piece is monophonic (no simultaneous pitches).
+    '''
+    def __init__(self):
+        pass
+
+    def test(self, piece):
+        return piece.is_monophonic()
+        
+    def why(self):
+        return f"Piece is not monophonic"
