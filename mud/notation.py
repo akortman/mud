@@ -1,15 +1,20 @@
 '''
-Music notation-related classes.
+Module contains all notation-related classes: Notes, Rests, Times...
 '''
 
 import copy
+from typing import Union, Optional
 from .settings import settings
+import music21 as mu
 
 class Pitch(object):
     '''
     A musical pitch, i.e. C, Bb4.
     May or may not have an associated octave value.
     '''
+    # Mapping for pitch strings to a relative pitch value
+    # (an integer between 0 and 11, a pitch with the octave removed).
+    # This is used for pitch construction purposes.
     str_to_relative_pitch = {
         'C':   0, 'C#': 1, 'Db':  1, 'D':   2,
         'D#':  3, 'Eb': 3, 'E':   4, 'F':   5,
@@ -21,6 +26,7 @@ class Pitch(object):
         'B-': 10,
     }
 
+    # A mapping from relative pitch to string, for formatting purposes. 
     relative_pitch_to_str = [
         'C',
         'Db',
@@ -28,10 +34,46 @@ class Pitch(object):
         'Eb',
         'E',
         'F',
-        'Gb', 'G', 'Ab', 'A', 'Bb', 'B'
+        'Gb',
+        'G',
+        'Ab',
+        'A',
+        'Bb',
+        'B',
     ]
 
-    def __init__(self, pitch, octave=None):
+    def __init__(
+            self,
+            pitch: Union[Pitch, str, int],
+            octave: Optional[int] = None):
+        '''
+        Construct a Pitch. A Pitch is a relative pitch with no octave (e.g. 'C#') or a
+        (relative pitch, octave) pair (e.g. 'D4'). 
+
+        Input should be performed in one of the following ways:
+            Pitch('C#')          -> the relative pitch 'C#', no octave.
+            Pitch('D4')          -> the pitch 'D', octave 4.
+            Pitch('F', 4)        -> the pitch 'F', octave 4.
+            Pitch(Pitch('D4'))   -> the pitch 'D', octave 4 (copied from another Pitch).
+            Pitch(Pitch('D'), 4) -> the pitch 'D', octave 4.
+        Ambiguous octaves are not allowed, e.g. Pitch('C#4', 5) or Pitch(Pitch('D', 3), 3).
+
+        Args:
+            `pitch`: Can be either:
+                (1) another Pitch, which this Pitch is a copy of. If that pitch has no octave
+                    information and `octave` argument is provided, this Pitch has the same 
+                    relative pitch with the octave info. If `octave` is provided and `pitch`
+                    already has octave information, a ValueError will be raised.
+                (2) a string, which is a pitch string (e.g. 'D' or 'C#') which is the relative
+                    pitch component with an optional octave number at the end of pitch string,
+                    e.g. 'C#3'. If the octave number is provided, the `octave` argument must not
+                    be. 
+                (3) an integer, representing the relative pitch of the constructed note.
+            `octave`: An optional octave number. If not provided, the octave will be taken from
+                the `pitch` argument if possible, otherwise this Pitch will have no octave
+                information. Must not be provided if the `pitch` argument already has octave
+                information.
+        '''
         if (octave is not None) and (type(octave) is not int):
             raise ValueError('octave argument must be None or int')
 
@@ -43,58 +85,71 @@ class Pitch(object):
             self._octave = pitch._octave
             if octave is not None:
                 if self._octave is not None:
-                    raise ValueError('Ambiguous octave in pitch construction: arg #0 has an octave marker, but arg #1 (explicit octave) is not None')
+                    raise ValueError('Ambiguous octave in pitch construction: arg #0 has an octave '
+                                     'marker, but arg #1 (explicit octave) is not None')
                 self._octave = octave
         elif type(pitch) is str:
             (self._relative_pitch, self._octave) = Pitch.pitch_string_to_pitch_octave_pair(pitch)
-            # If the parsed string has an octave value AND we were given an octave value, raise an error.
+            # If the parsed string has an octave value AND we were given an octave value,
+            # raise an error.
             if (octave is not None) and (self._octave is not None):
-                raise ValueError('provided note string has octave information, but octave information was also provided using the octave argument')
+                raise ValueError('provided note string has octave information, but octave '
+                                 'information was also provided using the octave argument')
             if self._octave is None: self._octave = octave
         elif type(pitch) is int:
-            if pitch < 0 or pitch > 11: raise ValueError('pitch must be between 0 and 11 (inclusive), use octave argument to give octave info')
+            if pitch < 0 or pitch > 11:
+                raise ValueError('pitch must be between 0 and 11 (inclusive), use octave argument '
+                                 'to give octave info')
             self._relative_pitch = pitch
             self._octave = octave
         else:
-            raise ValueError('invalid initialization of Pitch, args are: (pitch={}, octave={})'.format(pitch, octave))
+            raise ValueError(f'invalid initialization of Pitch, args are: '
+                             f'(pitch={pitch}, octave={octave})')
 
-    def octave(self):
+    def octave(self) -> Optional[int]:
+        '''
+        The octave number of the pitch (may be None if no octave information).
+        '''
         return self._octave
 
-    def midi_pitch(self, assumed_octave=None):
+    def midi_pitch(self, assumed_octave: Optional[int]=None) -> int:
         '''
-        Convert to an integer midi pitch.
-        If `assumed_octave` is provided, notes without octave information will be assumed to be in this octave,
-        otherwise ValueError will be thrown. This option is provided mainly for sorting purposes.
+        Returns the MIDI pitch value associated with this note.
+        Notes with no octave information don't have this. To account for this (for e.g. sorting
+        pitches), notes without octave information will be assumed to be in this octave.
+        If `assumed_octave` is not provided, ValueError will be thrown.
         '''
         if self._octave is None and assumed_octave is None:
             raise ValueError('Pitches without an octave don\'t have a midi absolute pitch')
-        return Pitch.to_midi_pitch(self._relative_pitch, self._octave if (self._octave is not None) else assumed_octave)
+        return Pitch.to_midi_pitch(
+            self._relative_pitch,
+            self._octave if (self._octave is not None) else assumed_octave)
 
-    def relative_pitch(self):
+    def relative_pitch(self) -> int:
+        ''' The relative pitch value of this Pitch '''
         return self._relative_pitch
 
-    def name_relative(self):
-        raise NotImplementedError
-
-    def strip_octave(self):
+    def strip_octave(self) -> Pitch:
+        ''' Return a Pitch that has the same relative pitch as this one, but no octave info '''
         return self.__class__(pitch=self._relative_pitch, octave=None)
 
-    def copy(self):
+    def copy(self) -> Pitch:
+        ''' Return a copy of this Pitch'''
         return self.__class__(self._relative_pitch, self._octave)
 
-    def name(self):
+    def name(self) -> str:
+        ''' Get a string representation of this Pitch '''
         if self._octave is None:
             return self.__class__.relative_pitch_to_str[self._relative_pitch]
-        return '{}{}'.format(self.__class__.relative_pitch_to_str[self._relative_pitch], self._octave)
+        return f'{self.__class__.relative_pitch_to_str[self._relative_pitch]}{self._octave}'
 
-    def __str__(self):
+    def __str__(self) -> str:
         return 'Pitch[\'{}\']'.format(self.name())
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
     
-    def __eq__(self, other):
+    def __eq__(self, other: Pitch) -> bool:
         return (self._relative_pitch == other._relative_pitch
                 and self._octave == other._octave)
 
@@ -102,14 +157,16 @@ class Pitch(object):
         return hash((self._relative_pitch, self._octave))
 
     @classmethod
-    def compare(cls, a, b):
+    def compare(cls, a: Pitch, b: Pitch) -> int:
         '''
-        returns negative if a is lower than b, 0 if they are the same, and positive if a is higher than b.
+        Pitch comparison function for sorting.
+        Returns negative if a is lower than b, 0 if they are the same, and positive if a is higher 
+        than b.
         '''
         return a._relative_pitch + 12*a._octave - b._relative_pitch + 12*b._octave
 
     @classmethod
-    def to_midi_pitch(cls, relative_pitch, octave):
+    def to_midi_pitch(cls, relative_pitch: int, octave: int) -> int:
         '''
         convert a pitch-octave pair into a midi pitch.
         e.g. C-1 -> 0, C4 -> 60, A0 -> 21
@@ -118,7 +175,7 @@ class Pitch(object):
         return relative_pitch + (octave + 1) * 12
 
     @classmethod
-    def pitch_string_to_pitch_octave_pair(cls, pitchstr):
+    def pitch_string_to_pitch_octave_pair(cls, pitchstr: str) -> Tuple[int, int]:
         '''
         parse a pitch string into a pitch-octave pair
         the octave part is optional
@@ -145,21 +202,24 @@ class Pitch(object):
             # Correct range of pitch in [0, 12)
             if pitch < 0: pitch += 12
             if pitch >= 12: pitch -= 12
-        assert pitch >= 0 and pitch < 12, f'Error: pitch string {pitch_part} produced out of range relative pitch'
+        if not (pitch >= 0 and pitch < 12):
+            raise ValueError(f'Error: pitch string {pitch_part} produced out of range relative '
+                             f'pitch')
         return pitch, octave
 
     @classmethod
-    def from_music21(cls, pitch):
+    def from_music21(cls, pitch: mu.pitch.Pitch) -> Pitch:
+        ''' Convert a music21 pitch object to a mud.Pitch '''
         if pitch.octave is None:
             return pitch.name.replace('-', 'b')
-        return cls('{}{}'.format(pitch.name.replace('-', 'b'), pitch.octave))
+        return cls(f"{pitch.name.replace('-', 'b')}{pitch.octave}")
 
 class Time(object):
     '''
     A class representing a musical time.
     '''
-    def __init__(self, time, resolution=settings.resolution):
-        if type(time) is self.__class__:
+    def __init__(self, time: Union[Time, float], resolution: Optional[float]=settings.resolution):
+        if isinstance(time, Time):
             self._resolution = time._resolution
             self._time = time._time
         else:
