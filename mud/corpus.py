@@ -1,13 +1,19 @@
+'''
+Module containing the Corpus class, which provides methods for loading an entire corpus of Pieces.
+'''
+
 from glob import iglob
 import random
 import pickle
 import music21 as mu
+from typing import Optional, Iterable
 
 from .piece import Piece
 from .fmt.piece_data import PieceData
 from . import piece_filter
 
 class AbstractCorpus(object):
+    # Common code for save/loading of corpuses.
     def __init__(self):
         raise NotImplementedError
 
@@ -22,10 +28,41 @@ class AbstractCorpus(object):
             self.__dict__ = pickle.load(f)
 
 class Corpus(AbstractCorpus):
-    def __init__(self, patterns=tuple(), filters=tuple(), from_file=None, discard_rests=False, max_len=None, ignore_load_errors=False, verbose=False, transpose_to=None):
+    '''
+    A Corpus contains a collection of different mud.Piece objects.
+    '''
+    def __init__(
+            self,
+            patterns:           Iterable[str] = [],
+            filters:            Iterable[str] = [],
+            from_file:          Optional[str] = None,
+            discard_rests:      bool = False,
+            max_len:            Optional[int] = None,
+            ignore_load_errors: bool = False,
+            verbose:            bool = False,
+            transpose_to:       Optional[str] = None):
         '''
         Load a corpus of pieces.
-        patterns: an iterable of patterns (ie '*.musicxml') to load into the corpus.
+        
+        Args:
+            `patterns`: an iterable of globbable patterns (ie '*.musicxml'). Files which match the
+                patterns will be loaded into the corpus. (Default: [])
+            `filters`: an iterable of functions. Each function should take the form
+                `f(mud.Piece) -> bool`. Only pieces which pass all filter functions will be kept.
+                Useful filters are found in the `mud.piece_filter` module. (Default: [])
+            `from_file`: This is a path to a pickled Corpus that will be loaded.
+                If used, other information provided to load pieces will be *ignored*. (Optional)
+            `discard_rests`: If True, the Rest notation events will be discarded in every piece.
+                (Default: False)
+            `max_len`: Stop loading when this many pieces have been successfully loaded. (Optional)
+            `ignore_load_errors`: If True, ignore any load errors. Depending on the data being
+                loaded, Music21 may not load pieces successfully, and this may be required.
+                (Default: False)
+            `verbose`: Show verbose output about the piece-loading process. (Default: False)
+            `transpose_to`: If provided, transpose all pieces to this key. (Optional)
+
+        Returns:
+            A corpus containing the requested pieces.
         '''
         self._pieces = []
         self._num_rejected = 0
@@ -40,12 +77,14 @@ class Corpus(AbstractCorpus):
                     for fname in iglob(pattern):
                         try:
                             res, why = self_.load_piece(fname, filters, transpose_to)
-                        except (mu.exceptions21.StreamException, mu.musicxml.xmlToM21.MusicXMLImportException):
+                        except (mu.exceptions21.StreamException,
+                                mu.musicxml.xmlToM21.MusicXMLImportException):
                             if verbose: print(f'    Failed to load file {fname}: ', end='')
                             if ignore_load_errors:
                                 if verbose: print('continuing')
                                 continue
-                            if verbose: print('failing (use `ignore_load_errors=True` in corpus to prevent)')
+                            if verbose: print('failing (use `ignore_load_errors=True` in corpus '
+                                              'to prevent)')
                             raise
                         if verbose:
                             if res:
@@ -103,7 +142,16 @@ class Corpus(AbstractCorpus):
             piece.discard_rests()
 
 class DataCorpus(AbstractCorpus):
-    def __init__(self, corpus, formatter, slice_resolution, discard_rests=False):
+    '''
+    A DataCorpus contains only ""data"" of a collection of pieces, intended for use as inputs and
+    targets for a machine learning model. See the `mud.fmt.PieceData` class for more info.
+    '''
+    def __init__(
+            self,
+            corpus:           Corpus,
+            formatter:        EventDataBuilder,
+            slice_resolution: float,
+            discard_rests:    bool = False):
         self._data = [PieceData(p, formatter, slice_resolution, discard_rests)
                       for p in corpus.pieces]
 
