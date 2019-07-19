@@ -6,7 +6,7 @@ from glob import iglob
 import random
 import pickle
 import music21 as mu
-from typing import Optional, Iterable
+from typing import Optional, Iterable, Tuple
 
 from .piece import Piece
 from .fmt.piece_data import PieceData
@@ -40,7 +40,7 @@ class Corpus(AbstractCorpus):
             max_len:            Optional[int] = None,
             ignore_load_errors: bool = False,
             verbose:            bool = False,
-            transpose_to:       Optional[str] = None):
+            transpose_to:       Optional[str] = None) -> Corpus:
         '''
         Load a corpus of pieces.
         
@@ -103,19 +103,19 @@ class Corpus(AbstractCorpus):
         return len(self._pieces)
 
     @property
-    def pieces(self):
+    def pieces(self) -> Iterable[Piece]:
         ''' The contained list of pieces '''
         return self._pieces
 
     @property
-    def num_rejected(self):
+    def num_rejected(self) -> int:
         ''' The number of pieces rejected when loading the corpus '''
         return self._num_rejected
 
     def passes_filters(
             self,
             piece: Piece,
-            filters: Iterable[Callable[Piece, bool]]):
+            filters: Iterable[Callable[Piece, bool]]) -> Tuple[bool, str]:
         '''
         Test whether a piece passes the required filter functions.
 
@@ -138,9 +138,10 @@ class Corpus(AbstractCorpus):
             self,
             piece:        str,
             filters:      Iterable[Callable[Piece, bool]] = [],
-            transpose_to: Optional[bool] = None):
+            transpose_to: Optional[bool] = None) -> Tuple[bool, str]:
         '''
         Load a single piece from a file into the Corpus if it passes the filters.
+        Returns a tuple `(success, reason)`, where `reason` describes why a piece failed.
         '''
         p = Piece(piece, transpose_to)
         passes, reason = self.passes_filters(p, filters)
@@ -153,7 +154,7 @@ class Corpus(AbstractCorpus):
             self,
             formatter:        EventDataBuilder,
             slice_resolution: float,
-            discard_rests:    Optional[bool] = False):
+            discard_rests:    Optional[bool] = False) -> DataCorpus:
         '''
         Return a DataCorpus object containing the pieces in this Corpus formatted according to the
         given formatter object.
@@ -187,21 +188,21 @@ class DataCorpus(AbstractCorpus):
             corpus:           Corpus,
             formatter:        EventDataBuilder,
             slice_resolution: float,
-            discard_rests:    bool = False):
+            discard_rests:    bool = False) -> DataCorpus:
         self._data = [PieceData(p, formatter, slice_resolution, discard_rests)
                       for p in corpus.pieces]
 
-    def size(self):
+    def size(self) -> int:
         return len(self._data)
 
     @property
-    def data(self):
+    def data(self) -> Iterable[PieceData]:
         return self._data
 
-    def __iter__(self):
+    def __iter__(self) -> Iterable[PieceData]:
         return self._data.__iter__()
     
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._data)
 
 
