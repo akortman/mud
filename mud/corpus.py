@@ -40,7 +40,7 @@ class Corpus(AbstractCorpus):
             max_len:            Optional[int] = None,
             ignore_load_errors: bool = False,
             verbose:            bool = False,
-            transpose_to:       Optional[str] = None) -> Corpus:
+            transpose_to:       Optional[str] = None):
         '''
         Load a corpus of pieces.
         
@@ -188,7 +188,7 @@ class DataCorpus(AbstractCorpus):
             corpus:           Corpus,
             formatter:        EventDataBuilder,
             slice_resolution: float,
-            discard_rests:    bool = False) -> DataCorpus:
+            discard_rests:    bool = False):
         self._data = [PieceData(p, formatter, slice_resolution, discard_rests)
                       for p in corpus.pieces]
 
