@@ -219,6 +219,15 @@ class Time(object):
     A class representing a musical time.
     '''
     def __init__(self, time: Union[Time, float], resolution: Optional[float]=settings.resolution):
+        '''
+        Create a Time object.
+
+        Args:
+            `time`: either another Time (for copy construction), or a float (indicating the number
+                of quarter notes in this Time).
+            `resolution`: an optional resolution which this Time will be quantized to. Defaults
+                to the resolution in settings.
+        '''
         if isinstance(time, Time):
             self._resolution = time._resolution
             self._time = time._time
@@ -228,49 +237,70 @@ class Time(object):
             if resolution is not None:
                 self.quantize_to(resolution)
 
-    def quantize(self):
-        return self.quantize_to(resolution=settings.resolution)
+    def quantize(self, resolution: Optional[float]=None) -> float:
+        '''
+        Quantize this Time to a given resolution. If not provided, defaults to the resolution
+        in settings.
+        Returns the error between the Times before and after quantization, in quarter notes.
+        '''
+        return self.quantize_to(settings.resolution if resolution is None else resolution)
 
-    def quantize_to(self, resolution):
+    def quantize_to(self, resolution: float) -> float:
+        '''
+        Quantize this Time to a given resolution.
+        Returns the error between the Times before and after quantization, in quarter notes.
+        '''
         t = self._time
         self._resolution = resolution
         self._time = resolution * round(self._time / resolution)
         return abs(t - self._time)
 
-    def copy(self):
+    def copy(self) -> Time:
+        ''' Return a copy of this Time '''
         return self.__class__(self._time, self._resolution)
 
-    def resolution(self):
+    def resolution(self) -> float:
+        ''' Return the resolution of this Time '''
         return self._resolution
 
-    def in_resolution_steps(self):
+    def in_resolution_steps(self) -> int:
+        '''
+        Return the number of discrete steps of resolution time that make up this time (e.g. if this
+        time is 2 and resolution is 0.5, this will return 4).
+        '''
         if self._resolution is None:
             raise ValueError('Can\'t give number of resolution steps in unquantized Time')
         return int(self._time / self._resolution)
 
-    def in_beats(self):
+    def in_beats(self) -> float:
+        ''' returns the number of beats (quarter notes) in this Time '''
         return self._time
 
-    def is_quantized(self):
+    def is_quantized(self) -> bool:
+        ''' returns whether this Time is quantized '''
         return self._resolution is not None
 
-    def as_quantized(self, resolution):
+    def as_quantized(self, resolution: float) -> Time:
+        ''' Return a copy of this Time quantized to a different resolution '''
         new = copy.copy(self)
         new.quantize_to(resolution)
         return new
 
-    def is_zero(self):
+    def is_zero(self) -> bool:
+        ''' Returns whether this Time is 0 beats (or very close) '''
         return abs(self._time) < 0.000001
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.is_quantized:
-            return f'Time[{self._time}, resolution={self._resolution}, steps={self.in_resolution_steps()}]'
+            return (
+                f'Time[{self._time}, resolution={self._resolution}, '
+                f'steps={self.in_resolution_steps()}]')
         return f'Time[{self._time}]'
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
     
-    def __eq__(self, other):
+    def __eq__(self, other: Time) -> bool:
         if type(other) is not self.__class__:
             return False
         if self._resolution == other._resolution:
@@ -283,7 +313,7 @@ class Time(object):
         b = other.as_quantized(res)
         return a.in_resolution_steps() == b.in_resolution_steps()
 
-    def __add__(self, other):
+    def __add__(self, other: Time) -> Time:
         if not isinstance(other, self.__class__):
             raise ValueError('can only add mud.Time to another mud.Time')
         return Time(self._time + other._time)
