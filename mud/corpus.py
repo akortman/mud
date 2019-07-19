@@ -34,7 +34,7 @@ class Corpus(AbstractCorpus):
     def __init__(
             self,
             patterns:           Iterable[str] = [],
-            filters:            Iterable[str] = [],
+            filters:            Iterable[Callable[Piece, bool]] = [],
             from_file:          Optional[str] = None,
             discard_rests:      bool = False,
             max_len:            Optional[int] = None,
@@ -99,24 +99,49 @@ class Corpus(AbstractCorpus):
             self.discard_rests()
 
     def size(self):
+        ''' the size (number of pieces) in the Corpus '''
         return len(self._pieces)
 
     @property
     def pieces(self):
+        ''' The contained list of pieces '''
         return self._pieces
 
     @property
     def num_rejected(self):
+        ''' The number of pieces rejected when loading the corpus '''
         return self._num_rejected
 
-    def passes_filters(self, piece, filters):
+    def passes_filters(
+            self,
+            piece: Piece,
+            filters: Iterable[Callable[Piece, bool]]):
+        '''
+        Test whether a piece passes the required filter functions.
+
+        Args:
+            `piece`: the piece to test.
+            `filters`: an iterable of lambda functions of the form `f(mud.Piece) -> bool`.
+        
+        Returns:
+            A tuple `(passes, reason)`. `passes` is a boolean value indicating if the piece passed
+            all the filters, and `reason` is a string which described why a piece did not pass if
+            it failed.
+        '''
         for f in filters:
             if not f(piece):
                 self._num_rejected += 1
                 return False, piece_filter.failure_reason(f)
         return True, "Passes"
 
-    def load_piece(self, piece, filters=tuple(), transpose_to=None):
+    def load_piece(
+            self,
+            piece:        str,
+            filters:      Iterable[Callable[Piece, bool]] = [],
+            transpose_to: Optional[bool] = None):
+        '''
+        Load a single piece from a file into the Corpus if it passes the filters.
+        '''
         p = Piece(piece, transpose_to)
         passes, reason = self.passes_filters(p, filters)
         if passes:
@@ -124,13 +149,21 @@ class Corpus(AbstractCorpus):
             return True, "Success"
         return False, reason
 
-    def format_data(self, formatter, slice_resolution, discard_rests=False):
+    def format_data(
+            self,
+            formatter:        EventDataBuilder,
+            slice_resolution: float,
+            discard_rests:    Optional[bool] = False):
+        '''
+        Return a DataCorpus object containing the pieces in this Corpus formatted according to the
+        given formatter object.
+        '''
         return DataCorpus(self, formatter, slice_resolution, discard_rests)
 
-    def filter(self, *filters):
+    def filter(self, *filters: Callable[Piece, bool]):
         '''
-        Filter out pieces that do not adhere to a set of filters.
-        see: piece_filter.py
+        Filter out pieces that do not adhere to a set of filters. After calling, all pieces that
+        do not pass the provided filter functions are removed from the corpus object.
         '''
         len_old = len(self._pieces)
         for f in filters:
@@ -138,6 +171,9 @@ class Corpus(AbstractCorpus):
         self._num_rejected += len_old - len(self._pieces)
 
     def discard_rests(self):
+        '''
+        Discard all rest events in all contained pieces.
+        '''
         for piece in self._pieces:
             piece.discard_rests()
 
