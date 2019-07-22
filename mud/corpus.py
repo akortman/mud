@@ -2,13 +2,16 @@
 Module containing the Corpus class, which provides methods for loading an entire corpus of Pieces.
 '''
 
+from __future__ import annotations
+
 from glob import iglob
 import random
 import pickle
 import music21 as mu
-from typing import Optional, Iterable, Tuple
+from typing import Optional, Iterable, Tuple, Callable
 
 from .piece import Piece
+from .fmt import EventDataBuilder
 from .fmt.piece_data import PieceData
 from . import piece_filter
 
@@ -34,7 +37,7 @@ class Corpus(AbstractCorpus):
     def __init__(
             self,
             patterns:           Iterable[str] = [],
-            filters:            Iterable[Callable[Piece, bool]] = [],
+            filters:            Iterable[Callable[[Piece], bool]] = [],
             from_file:          Optional[str] = None,
             discard_rests:      bool = False,
             max_len:            Optional[int] = None,
@@ -115,7 +118,7 @@ class Corpus(AbstractCorpus):
     def passes_filters(
             self,
             piece: Piece,
-            filters: Iterable[Callable[Piece, bool]]) -> Tuple[bool, str]:
+            filters: Iterable[Callable[[Piece], bool]]) -> Tuple[bool, str]:
         '''
         Test whether a piece passes the required filter functions.
 
@@ -137,7 +140,7 @@ class Corpus(AbstractCorpus):
     def load_piece(
             self,
             piece:        str,
-            filters:      Iterable[Callable[Piece, bool]] = [],
+            filters:      Iterable[Callable[[Piece], bool]] = [],
             transpose_to: Optional[bool] = None) -> Tuple[bool, str]:
         '''
         Load a single piece from a file into the Corpus if it passes the filters.
