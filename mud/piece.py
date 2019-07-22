@@ -7,9 +7,14 @@ from .notation import Pitch, Note, Rest, Time
 from .span import Span
 from .event import Event
 from .utils import deprecated
+from typing import Optional
 
 class Piece(object):
-    def __init__(self, piece=None, discard_rests=False, transpose_to=None):
+    def __init__(
+            self,
+            piece:         Optional[str] = None,
+            discard_rests: bool = False,
+            transpose_to:  Optional[str] = None):
         self.init_empty()
         if piece is None:
             assert transpose_to is None, "Empty initialization requires no transpose_to argument"
