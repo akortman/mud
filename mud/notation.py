@@ -78,9 +78,6 @@ class Pitch(object):
         '''
         if (octave is not None) and (type(octave) is not int):
             raise ValueError('octave argument must be None or int')
-
-        if (type(octave) is int) and (octave < 0):
-            raise ValueError('octave must be None or >= 0')
             
         if type(pitch) is Pitch:
             self._relative_pitch = pitch._relative_pitch
@@ -175,6 +172,16 @@ class Pitch(object):
         see: https://en.wikipedia.org/wiki/Scientific_pitch_notation
         '''
         return relative_pitch + (octave + 1) * 12
+    
+    @classmethod
+    def from_midi_pitch(cls, midi_pitch: int) -> int:
+        '''
+        convert a pitch-octave pair into a midi pitch.
+        e.g. 0 -> C-1, 60 -> C4, 21 -> A0
+        see: https://en.wikipedia.org/wiki/Scientific_pitch_notation
+        '''
+        rp = midi_pitch % 12
+        return cls(pitch=rp, octave=(midi_pitch - rp) // 12 - 1)
 
     @classmethod
     def pitch_string_to_pitch_octave_pair(cls, pitchstr: str) -> Tuple[int, int]:
