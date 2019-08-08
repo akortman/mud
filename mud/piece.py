@@ -71,7 +71,10 @@ class Piece(object):
             assert self._key_mode is not None
         # Ensure the stream has bars
         if (not s.hasMeasures()):
-            s.makeMeasures(inPlace=True)
+            try:
+                s.makeMeasures(inPlace=True)
+            except mu.exceptions21.StreamException:
+                raise ValueError('Cannot infer measures for Piece')
 
         # Convert the music21 stream, each bar becomes a mud.Span
         measures = s.getElementsByClass('Measure')
