@@ -2,7 +2,7 @@
 `mud` (`mu`sic`d`ata) is a music data processing library for deep learning projects.
 `mud` is made to simplify the process of converting events in music files into _input
 vectors_ and _target labels_, not for musical computation in general (see `music21`, which
-`mud` uses, for that). It's also primarily made to fit my (ie @jkortman's) needs, but
+`mud` uses, for that). It's also primarily made to fit my (ie @akortman's) needs, but
 anyone is welcome to use/extend it.
 
 When working on deep learning applications to music, I've found data handling code to be
